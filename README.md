@@ -1,5 +1,5 @@
 # GreyRectangle
-is a jump and run game.
+GreyRectangle is a jump and run game.
 
 to install it follow these steps:
 
