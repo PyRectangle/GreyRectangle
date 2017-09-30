@@ -1,7 +1,6 @@
 # GreyRectangle
 GreyRectangle is a jump and run game.
 
-
 to run it from source follow these steps:
 
   1.install pygame for python3
