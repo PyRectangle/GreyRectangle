@@ -32,7 +32,7 @@ class Window:
         self.button = None
         self.on_close = on_close
 
-    def textanzeige(self, anz="...", gr=40, color=(0, 0, 0), posx=0, posy=0):
+    def display_text(self, anz="...", gr=40, color=(0, 0, 0), posx=0, posy=0):
         img = pygame.font.Font('SWF/freesansbold.ttf', gr).render(anz, 1, color)
         rect = img.get_rect()
         rect.x = posx
@@ -76,4 +76,4 @@ class Window:
                                     (button[0], button[3] + button[1]), (button[2] + button[0], button[3] + button[1]),
                                     (button[2] + button[0], button[1]), (button[2] + button[0], button[3] + button[1])),
                                     1)
-            self.textanzeige(button[4], button[5], posx=button[0] + 3, posy=button[1] + 5)
+            self.display_text(button[4], button[5], posx=button[0] + 3, posy=button[1] + 5)
