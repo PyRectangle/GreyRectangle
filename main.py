@@ -25,6 +25,16 @@ fall_count = 1
 jump_count = 0
 jump_active = False
 on_ground = False
+in_blocks = []
+level_number = 1
+menu_x = 0
+menu_y = 0
+menu_direction = True
+playing_sound = ""
+music = "The music is from audio library more information can be found at the license.html file in the music folder."
+opened_level = level.open_level("levels/" + levels[selected_level] + "/region/1.rgn")
+region = opened_level[0]
+lifes = opened_level[5]
 images = SWF.resources.load_images(True, ("images/player.png",
                                           "images/stone.png",
                                           "images/grass.png",
@@ -33,21 +43,23 @@ images = SWF.resources.load_images(True, ("images/player.png",
                                           "images/lava.png",
                                           "images/door.png",
                                           "images/up.png",
-                                          "images/up_pressed.png"))
+                                          "images/up_pressed.png",
+                                          "images/wood.png"))
 clock = pygame.time.Clock()
 win.create_button(buttons_x, buttons_y, 211, 50, "start game", 40)
 win.create_button(buttons_x + 20, buttons_y + 80, 170, 50, "settings", 40)
 
 
 def render():
-    global selected_image, selected_image_count, i
+    global selected_image, selected_image_count, i, in_blocks, menu_x, menu_y, menu_direction
     if level_selection:
+        in_blocks = []
         win.window.fill((255, 100, 100))
         pygame.draw.line(win.window, (100, 255, 100), (0, 225), (640, 225), 70)
         for pos in -3, -2, -1, 1, 2, 3, 0:
             try:
                 if selected_level + pos >= 0:
-                    win.textanzeige(levels[selected_level + pos], 40, (0, 0, 0), 80, pos * 70 + 200)
+                    win.display_text(levels[selected_level + pos], 40, (0, 0, 0), 80, pos * 70 + 200)
                     try:
                         win.window.blit(SWF.resources.load_images(True,
                                                                   ("levels/" + levels[selected_level + pos] +
@@ -57,9 +69,32 @@ def render():
             except IndexError:
                 pass
     elif not in_level:
+        in_blocks = []
         win.window.fill((255, 255, 255))
+        menu_block_x = int(menu_x / 64)
+        menu_block_y = int(menu_y / 64)
+        for block_y in range(9):
+            for block_x in range(11):
+                array_pos_of_block_x = block_x - menu_block_x
+                array_pos_of_block_y = block_y - menu_block_y
+                if array_pos_of_block_x >= 0 and array_pos_of_block_y >= 0:
+                    try:
+                        if region[array_pos_of_block_y][array_pos_of_block_x] == 6:
+                            win.window.blit(blocks[region[array_pos_of_block_y][array_pos_of_block_x]].texture,
+                                            ((block_x - menu_block_x) * 64 + menu_x,
+                                            (block_y - menu_block_y - 1) * 64 + menu_y))
+                        elif region[array_pos_of_block_y][array_pos_of_block_x] != 0:
+                            win.window.blit(blocks[region[array_pos_of_block_y][array_pos_of_block_x]].texture,
+                                            ((block_x - menu_block_x) * 64 + menu_x,
+                                             (block_y - menu_block_y) * 64 + menu_y))
+                    except IndexError:
+                        menu_direction = False
+                if menu_x > 0 or menu_y > 0:
+                    menu_direction = True
+        win.display_text(music, 12, (0, 0, 0), 0, win.window.get_height() - 12)
         win.handle_buttons()
     else:
+        in_blocks = []
         win.window.fill((255, 255, 255))
         player_block_x = int(player_x / 64)
         player_block_y = int(player_y / 64)
@@ -70,6 +105,26 @@ def render():
                 if array_pos_of_block_x >= 0 and array_pos_of_block_y >= 0:
                     try:
                         try:
+                            in_block = True
+                            coordsq1 = [player_on_screen_x,
+                                        player_on_screen_y,
+                                        player_on_screen_x + 49,
+                                        player_on_screen_y + 89]
+                            coordsq2 = [(block_x - player_block_x) * 64 + player_x,
+                                        (block_y - player_block_y - 1) * 64 + player_y + 64,
+                                        (block_x - player_block_x) * 64 + player_x + 63,
+                                        (block_y - player_block_y - 1) * 64 + player_y + 127]
+                            for i in (0, 2, 1), (2, 0, 0), (1, 3, 1), (3, 1, 0):
+                                if i[2] == 1:
+                                    if coordsq1[i[0]] > coordsq2[i[1]]:
+                                        in_block = False
+                                        break
+                                if i[2] == 0:
+                                    if coordsq1[i[0]] < coordsq2[i[1]]:
+                                        in_block = False
+                                        break
+                            if in_block:
+                                in_blocks.append(region[array_pos_of_block_y][array_pos_of_block_x])
                             if region[array_pos_of_block_y][array_pos_of_block_x] == 6:
                                 win.window.blit(blocks[region[array_pos_of_block_y][array_pos_of_block_x]].texture,
                                                 ((block_x - player_block_x) * 64 + player_x,
@@ -154,6 +209,25 @@ def window_close():
     exit()
 
 
+def die():
+    global player_x, player_y, lifes, in_level, level_selection
+    player_x = opened_level[2]
+    player_y = opened_level[3]
+    lifes -= 1
+    if lifes <= 0:
+        lifes = opened_level[5]
+        in_level = False
+        level_selection = True
+
+
+def playsound(sound):
+    global playing_sound
+    if playing_sound != sound:
+        playing_sound = sound
+        pygame.mixer_music.load("music/" + sound)
+        pygame.mixer_music.play(-1, 0.0)
+
+
 class Block:
     def __init__(self, texture, solid, dead, colorkey):
         self.texture = texture
@@ -170,14 +244,24 @@ blocks = [
     Block(images[3], True, False, None),
     Block(images[4], False, False, None),
     Block(images[5], False, True, None),
-    Block(images[6], False, False, (255, 255, 255))
+    Block(images[6], False, False, (255, 255, 255)),
+    Block(images[9], True, False, None)
 ]
 
+playsound(opened_level[4])
 win.on_close = window_close
 
 while True:
     clock.tick(0)
+    dt = clock.get_time()
     win.handle_events()
+    speed = int(dt / 2)
+    if menu_direction:
+        menu_x -= speed / 10
+        menu_y -= speed / 10
+    else:
+        menu_x += speed / 10
+        menu_y += speed / 10
     if win.button == "settings" and not settings:
         settings = True
         for i in range(2):
@@ -197,12 +281,17 @@ while True:
         if win.keys[pygame.K_RETURN]:
             level_selection = False
             in_level = True
+            level_number = 1
             opened_level = level.open_level("levels/" + levels[selected_level] + "/region/1.rgn")
             player_x = opened_level[2]
             player_y = opened_level[3]
             region = opened_level[0]
+            lifes = opened_level[5]
+            playsound(opened_level[4])
         if win.keys[pygame.K_ESCAPE]:
             level_selection = False
+            menu_x = 0
+            menu_y = 0
             win.create_button(buttons_x, buttons_y, 211, 50, "start game", 40)
             win.create_button(buttons_x + 20, buttons_y + 80, 170, 50, "settings", 40)
         if win.keys[pygame.K_DOWN] and not levels[selected_level] == levels[-1]:
@@ -220,8 +309,7 @@ while True:
         else:
             select_level_up_count = 0
     if in_level:
-        speed = int(clock.get_time() / 2)
-        fall_speed = int(clock.get_time() / 1.5 * fall_count)
+        fall_speed = int(dt / 1.5 * fall_count)
         for index in range(speed):
             if win.keys[pygame.K_ESCAPE]:
                 in_level = False
@@ -252,7 +340,26 @@ while True:
             jump_count += 1
             if jump_count >= 25:
                 jump_active = False
+    for i in in_blocks:
+        if i == 6 and win.keys[pygame.K_UP]:
+            try:
+                level_number += 1
+                opened_level = level.open_level("levels/" +
+                                                levels[selected_level] +
+                                                "/region/" +
+                                                str(level_number) +
+                                                ".rgn")
+                player_x = opened_level[2]
+                player_y = opened_level[3]
+                region = opened_level[0]
+                playsound(opened_level[4])
+            except FileNotFoundError:
+                in_level = False
+                level_selection = True
+        if blocks[i].dead:
+            die()
+            break
     render()
     if in_level:
-        win.textanzeige("FPS:" + str(int(clock.get_fps())), 25)
+        win.display_text("lifes:" + str(lifes) + "  FPS:" + str(int(clock.get_fps())), 25)
     pygame.display.update()
