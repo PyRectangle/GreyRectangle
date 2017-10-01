@@ -1,16 +1,17 @@
 def open_level(file):
     datei = open(file, "r")
-    size_spawn = []
-    for i in range(4):
+    size_spawn_music_lifes = []
+    for i in range(6):
         byte = ""
         text = ""
         while byte != "\t" and byte != "\n":
             text += byte
             byte = datei.read(1)
-        size_spawn.append(int(text))
-    size = (size_spawn[2], size_spawn[3])
-    spawn_x = size_spawn[0]
-    spawn_y = size_spawn[1]
+        size_spawn_music_lifes.append(text)
+    size = (int(size_spawn_music_lifes[3]), int(size_spawn_music_lifes[4]))
+    spawn_x = int(size_spawn_music_lifes[1])
+    spawn_y = int(size_spawn_music_lifes[2])
+    music = size_spawn_music_lifes[0]
     array = []
     tmp_array = []
     text = ""
@@ -29,12 +30,12 @@ def open_level(file):
             text += byte
         if byte == "\n":
             break
-    return array, size, spawn_x, spawn_y
+    return array, size, spawn_x, spawn_y, music, int(size_spawn_music_lifes[5])
 
 
-def save_level(array, file, size, spawn_x, spawn_y):
+def save_level(array, file, size, spawn_x, spawn_y, music):
     datei = open(file, "w")
-    text = str(spawn_x) + "\t" + str(spawn_y) + "\n" + str(size[0]) + "\t" + str(size[1]) + "\n"
+    text = music + "\n" + str(spawn_x) + "\t" + str(spawn_y) + "\n" + str(size[0]) + "\t" + str(size[1]) + "\n"
     datei.write(text)
     for i in array:
         for ii in i:
