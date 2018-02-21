@@ -1,5 +1,6 @@
 import pygame
 import resources
+import os
 from screeninfo import get_monitors
 
 
@@ -9,7 +10,7 @@ def on_close():
 
 
 class Window:
-    def __init__(self, size=(640, 480), caption="SWF window", icon=None, mouse_visible=True, flags=0):
+    def __init__(self, size=(640, 480), caption="SWF window_surface", icon=None, mouse_visible=True, flags=0):
         pygame.init()
         pygame.fastevent.init()
         self.size = size
@@ -20,7 +21,7 @@ class Window:
         pygame.display.set_caption(caption)
         pygame.mouse.set_visible(mouse_visible)
         if icon is not None:
-            pygame.display.set_icon(pygame.transform.scale(pygame.image.load(icon), (32, 32)))
+            pygame.display.set_icon(pygame.image.load(icon))
         self.keys = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -51,6 +52,7 @@ class Window:
         self.resolution = get_monitors()[0]
         self.size_before_fullscreen = self.size
         self.dt = 0
+        self.size_multiplier = 1
 
     def display_text(self, text="...", size=40, color=(0, 0, 0), posx=0, posy=0):
         self.window_surface.blit(pygame.font.Font('SWF/freesansbold.ttf', size).render(text, 1, color), (posx, posy))
@@ -78,14 +80,26 @@ class Window:
                                                              (pix_pos - rect.x + posx, posy + size), 1)
         self.window_surface.blit(img, (posx, posy), rect)
 
+    def display_update(self):
+        if self.resizable:
+            self.window.blit(pygame.transform.scale(self.window_surface, self.dimensions), (0, 0))
+        else:
+            self.window.blit(self.window_surface, (0, 0))
+        pygame.display.update()
+
     def toggle_fullscreen(self, boolean):
         if boolean:
-            self.size_before_fullscreen = self.dimensions
             self.dimensions = (self.resolution.width, self.resolution.height)
-            self.window = pygame.display.set_mode(self.dimensions, self.flags | pygame.FULLSCREEN)
+            if pygame.display.get_driver() == "x11":
+                os.environ['SDL_VIDEO_WINDOW_POS'] = "%d, %d" % (0, 0)
+                self.window = pygame.display.set_mode(self.dimensions, self.flags | pygame.NOFRAME)
+            else:
+                os.environ['SDL_VIDEO_WINDOW_POS'] = "%d, %d" % (-1, 0)
+                self.window = pygame.display.set_mode(self.dimensions, self.flags | pygame.NOFRAME)
         else:
-            self.dimensions = self.size_before_fullscreen
-            self.window = pygame.display.set_mode(self.dimensions, self.flags)
+            os.environ['SDL_VIDEO_WINDOW_POS'] = "%d, %d" % (self.resolution.width / 2 - 320, self.resolution.height / 2 - 240)
+            self.window = pygame.display.set_mode(self.size, self.flags)
+            self.dimensions = self.size
 
     def handle_events(self):
         self.clock.tick(0)
@@ -107,6 +121,7 @@ class Window:
                 if event.button == 5:
                     self.mouse_scroll = 1
             if event.type == pygame.VIDEORESIZE:
+                os.environ['SDL_VIDEO_WINDOW_POS'] = ""
                 self.window = pygame.display.set_mode(event.size, self.flags)
                 self.dimensions = event.size
             self.mouse_pressed = pygame.mouse.get_pressed()
@@ -122,13 +137,6 @@ class Window:
             pos[i] /= self.dimensions[i] / self.size[i]
             pos[i] = int(pos[i])
         return pos
-
-    def display_update(self):
-        if self.resizable:
-            self.window.blit(pygame.transform.scale(self.window_surface, self.dimensions), (0, 0))
-        else:
-            self.window.blit(self.window_surface, (0, 0))
-        pygame.display.update()
 
     def create_button(self, x, y, dx, dy, text, size, text_x=3, text_y=5):
         self.buttons_objs.append([x, y, dx, dy, text, size, [text_x, text_y]])
@@ -184,6 +192,8 @@ class Window:
             if not text_input[0] > mouse_pos[0] and not text_input[2] + text_input[0] < mouse_pos[0] and \
                    not text_input[1] > mouse_pos[1] and not text_input[3] + text_input[1] < mouse_pos[1]:
                 if self.mouse_pressed != (0, 0, 0):
+                    for i in self.text_input_objs:
+                        i[8] = False
                     text_input[8] = True
             if text_input[8]:
                 text_input[12] += 1

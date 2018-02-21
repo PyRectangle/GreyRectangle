@@ -17,6 +17,12 @@ def output(text):
 
 output("creating window...")
 win = SWF.Window(caption="GreyRectangle", icon="images/player.png", flags=pygame.RESIZABLE)
+pygame.display.quit()
+pygame.display.init()
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d, %d" % (win.resolution.width / 2 - 320, win.resolution.height / 2 - 240)
+win.window = pygame.display.set_mode((640, 480), win.flags)
+pygame.display.set_caption("GreyRectangle")
+pygame.display.set_icon(pygame.image.load("images/player.png"))
 output("setting variables...")
 buttons_x = win.window_surface.get_width() / 2 - 105
 buttons_y = win.window_surface.get_height() / 2 - 80
@@ -646,7 +652,7 @@ while True:
             speed += speed_count
             speed_count -= int(speed_count)
         speed = int(speed)
-    menu_speed = speed / 10
+    menu_speed = speed * opened_level[1][0] * opened_level[1][1] / 10000
     menu_count += 1
     if menu_count >= fps * 10:
         menu_count = 0
@@ -671,8 +677,15 @@ while True:
         volume = win.get_percent_of_bar(0) / 100
         pygame.mixer_music.set_volume(volume)
         if win.button == "Reset window size":
+            pygame.display.quit()
+            pygame.display.init()
             win.dimensions = win.size
+            os.environ['SDL_VIDEO_WINDOW_POS'] = "%d, %d" % (win.resolution.width / 2 - 320, win.resolution.height / 2 - 240)
             win.window = pygame.display.set_mode(win.size, win.flags)
+            pygame.display.set_icon(pygame.image.load("images/player.png"))
+            pygame.display.set_caption("GreyRectangle")
+            win.button = None
+            win.mouse_pressed = (0, 0, 0)
     if win.button == "Play":
         output("opening level selection...")
         level_selection = True
@@ -851,7 +864,8 @@ while True:
                     if test_walls("down"):
                         player_y -= 1
                         on_ground = False
-                        fall_count *= fall_multiplier
+                        if not fall_count > 10:
+                            fall_count *= fall_multiplier
                     else:
                         on_ground = True
                         fall_count = 1
@@ -860,7 +874,8 @@ while True:
                     if test_walls("up"):
                         player_y += 1
                         on_ground = False
-                        fall_count *= fall_multiplier
+                        if not fall_count > 10:
+                            fall_count *= fall_multiplier
                     else:
                         on_ground = True
                         fall_count = 1
@@ -1223,13 +1238,11 @@ while True:
                 try:
                     playsound(opened_level[4])
                 except pygame.error:
-                    clic = "cp " + path + " music"
-                    os.system(clic)
+                    shutil.copyfile(path, "music")
                     try:
                         playsound(opened_level[4])
                     except pygame.error:
-                        clic = "rm music/" + opened_level[4]
-                        os.system(clic)
+                        os.remove("music/" + opened_level[4])
                         opened_level[4] = back_music
             else:
                 opened_level[4] = back_music
@@ -1257,13 +1270,11 @@ while True:
             for file in os.listdir("levels/" + levels[selected_level] + "/region"):
                 file_count += 1
             if file_count > 1:
-                clic = "rm levels/" + levels[selected_level] + "/region/" + str(level_number) + ".rgn"
-                os.system(clic)
+                os.remove("levels/" + levels[selected_level] + "/region/" + str(level_number) + ".rgn")
                 level_list = os.listdir("levels/" + levels[selected_level] + "/region")
                 for i in range(file_count - level_number):
-                    clic = "mv levels/" + levels[selected_level] + "/region/" + str(level_number + i + 1) +\
-                           ".rgn levels/" + levels[selected_level] + "/region/" + str(level_number + i) + ".rgn"
-                    os.system(clic)
+                    shutil.move("levels/" + levels[selected_level] + "/region/" + str(level_number + i + 1) + ".rgn",
+                                "levels/" + levels[selected_level] + "/region/" + str(level_number + i) + ".rgn")
                 opened_level = level.open_level("levels/" + levels[selected_level] + "/region/1.rgn")
                 level_number = 1
                 editor_x = opened_level[2]
