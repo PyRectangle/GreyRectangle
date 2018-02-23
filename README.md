@@ -6,8 +6,10 @@ To play it on windows, you can run it from source, just make sure that [Python3.
 
 ## Dependencies:
 ### Linux:
-```pip3 install screeninfo pygame shutil```
+```pip3 install screeninfo pygame```
 #### Debian:
-```sudo apt-get install python3-pygame```
+```apt-get install python3-pygame```
+and
+```pip3 install screeninfo```
 ### Windows:
-```py -m pip install screeninfo pygame shutil```
+```py -m pip install screeninfo pygame```
