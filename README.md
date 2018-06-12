@@ -1,15 +1,9 @@
 # GreyRectangle
 ### GreyRectangle is a jump and run game.
 
-To play it, you can download the [Debian Package](https://github.com/PyRectangle/GreyRectangle/files/1347119/GreyRectangle_0.0-2.zip) or the [Installer](https://github.com/PyRectangle/GreyRectangle/files/1347122/GreyRectangleInstaller.zip) (only works on linux).
-To play it on windows, you can run it from source, just make sure that [Python3.X](https://www.python.org/) and the dependencies are installed and run the main.py script.
+To play it install [Python3.X](https://www.python.org/downloads/release/python-365/) and the dependencies  and run the Main.py script. If you use a linux OS then python3 is probably in the repositorys.
 
 ## Dependencies:
-### Linux:
-```pip3 install screeninfo pygame```
-#### Debian:
-```apt-get install python3-pygame```
-and
-```pip3 install screeninfo```
-### Windows:
-```py -m pip install screeninfo pygame```
+To install pip you can follow [this](https://pip.pypa.io/en/stable/installing/) instructions.
+If pip is installed you can install the dependencies with this command:                                                             
+```pip install pygame screeninfo```
