@@ -36,7 +36,7 @@ class Player():
         self.jump_dist = self.jump_height - 3
            
     def jump_update(self, main):
-        self.jump_dist /= 2 * self.jump_speed
+        self.jump_dist /= 2
         self.jump_dist += self.last_jump_dist
         self.last_jump_dist = self.jump_dist - int(self.jump_dist)
         self.move((self.UP, ), self.jump_dist, True, main)
