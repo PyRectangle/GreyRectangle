@@ -1,9 +1,13 @@
+import os
+import sys
+
+os.chdir(os.path.dirname(sys.argv[0]))
+
 import pygame
 import Player
 import shutil
 import Frame
 import time
-import os
 import Block as Blk
 from level import Level
 from config import Config
