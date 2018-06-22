@@ -1,7 +1,10 @@
 import os
 import sys
 
-os.chdir(os.path.dirname(sys.argv[0]))
+try:
+    os.chdir(os.path.dirname(sys.argv[0]))
+except FileNotFoundError:
+    pass
 
 import pygame
 import Player
