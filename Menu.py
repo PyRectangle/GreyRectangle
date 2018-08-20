@@ -3,6 +3,7 @@ class Menu:
         self.guis = []
         self.createdGuis = []
         self.created = False
+        self.SOUNDS = ["resources/sound/GuiHover.ogg", "resources/sound/GuiPressed.ogg"]
     
     def addGui(self, guiType, args):
         self.guis.append([guiType, args])

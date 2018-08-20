@@ -1,30 +1,23 @@
-from Frame.gui.ClickAnim import ClickAnim
+from Frame.baseFunctions import *
 from Frame.gui.Gui import Gui
 
 
 class Button(Gui):
-    def __init__(self, function, *args, **kwargs):
+    def __init__(self, function, functionArgs, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        output("Button: Creating " + self.text + " button...", "debug")
         self.wasPressed = False
         self.function = function
-        self.clickAnims = []
+        self.functionArgs = functionArgs
 
     def update(self):
         super().update()
+        output("Button: Creating a click animastion if pressed...", "complete")
         if self.pressed and not self.wasPressed and self.rightCoords:
-            self.clickAnims.append(ClickAnim(self))
-        self.removables = []
-        for i in range(len(self.clickAnims)):
-            self.clickAnims[i].update()
-            if self.clickAnims[i].finished:
-                self.removables.append(i)
-        subtract = 0
-        for i in self.removables:
-            del self.clickAnims[i - subtract]
-            subtract += 1
+            self.window.guiHandler.createClickAnim(self)
         self.wasPressed = self.pressed
     
     def render(self):
         super().render()
-        for clickAnim in self.clickAnims:
-            clickAnim.render()
+        if self.window.guiHandler.clickAnim != None:
+            self.window.guiHandler.clickAnim.render()
