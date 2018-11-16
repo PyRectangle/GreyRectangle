@@ -1,8 +1,0 @@
-# standard settings
-FPSLimit = 0
-Volume = 1
-
-# Controls
-FullScreen = 292
-GuiChanger = 9
-GuiPresser = 13
