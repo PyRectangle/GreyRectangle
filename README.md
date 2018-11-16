@@ -1,4 +1,8 @@
-# GreyRectangle development version
-I'm currently rewriting the game in this branch.
+# GreyRectangle
+## About
+GreyRectangle is a jump and run game.<br>
+You can find more information on its [website]().
 ## Installation
-Install python3 with pygame and screeninfo then run the Main.py script.
+You can find the installation instructions for GreyRectangle [here]()
+## Download
+You can download it from github or from the [download section of the website]()

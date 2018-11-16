@@ -1,12 +1,16 @@
 from Frame.baseFunctions import *
+import threading
 import pygame
 
 
 class Gui:
     def __init__(self, x, y, width, height, text, color, frameColor, selectColor, textColor, fontFile, antialias,
-                 pressDifference, steps, sec, comeIn, direction, startPos, sounds, window):
+                 pressDifference, steps, sec, comeIn, direction, startPos, sounds, window, textSize = None):
         output("Gui: Creating a gui with the following args: (x: " + str(x) + ", y: " + str(y) + ", width: " + str(width) + ", height: " + str(height) +
                ", ...) named " + text, "debug")
+        if textSize == None:
+            textSize = height
+        self.textSize = textSize
         self.x = x
         self.y = y
         self.width = width
@@ -22,6 +26,7 @@ class Gui:
         for sound in sounds:
             if sound != None:
                 self.sounds.append(pygame.mixer.Sound(sound))
+        self.volume = 1
         self.pressed = False
         self.wasPressedGui = False
         self.mouseTouchesButton = False
@@ -63,7 +68,7 @@ class Gui:
             else:
                 self.x, self.y = self.startPos
         self.window.guiHandler.addGui(self)
-    
+        
     def getTouch(self):
         output("Gui: Looking for the mouse touching this gui...", "complete")
         self.mouseTouchesButton = self.window.mousePos[0] <= self.x + self.width and \
@@ -131,6 +136,14 @@ class Gui:
         output("Gui: Is pressed: " + str(self.pressed), "complete")
         self.wasPressedGui = self.pressed
 
+    def setVolume(self, volume):
+        for sound in self.sounds:
+            sound.set_volume(volume)
+    
+    def delete(self):
+        self.rightCoords = False
+        self.remove = True
+
     def render(self):
         output("Gui: Rendering...", "complete")
         points = [self.coords[0:2], [self.coords[0] + self.coords[2], self.coords[1]], [self.coords[0] + self.coords[2], self.coords[1] + self.coords[3]],
@@ -139,11 +152,21 @@ class Gui:
             pygame.draw.polygon(self.window.surface, self.selectColor, points)
         else:
             pygame.draw.polygon(self.window.surface, self.color, points)
-        self.renderObj.text(self.fontFile, int(self.height), self.text, self.antialias, self.textColor, None,
-                            self.window.surface, width = self.width, height = self.height, addX = self.x, addY = self.y)
-        pygame.draw.lines(self.window.surface, self.frameColor, 4, [[self.x, self.y], [self.x + self.width - 1, self.y],
-                                                                    [self.x + self.width - 1, self.y + self.height - 1], [self.x, self.y + self.height - 1],
+        pygame.draw.lines(self.window.surface, self.frameColor, 4, [[self.x, self.y], [self.x + self.width, self.y],
+                                                                    [self.x + self.width, self.y + self.height], [self.x, self.y + self.height],
                                                                     [self.x, self.y]], 1)
+        self.renderObj.text(self.fontFile, int(self.textSize + self.height - self.startCoords[3]), self.text, self.antialias, self.textColor, None,
+                            self.window.surface, width = self.width, height = self.height, addX = self.x, addY = self.y)
+        try:
+            pixPos = self.width / 100 * self.pos + self.x
+            width = self.width / 100
+            height = self.height - 4
+            y = (self.height - height) / 2
+            points = [[pixPos - width / 2, self.y + y], [pixPos - width / 2, self.y + y + height], [pixPos + width / 2, self.y + y + height],
+                      [pixPos + width / 2, self.y + y]]
+            pygame.draw.polygon(self.window.surface, self.slideColor, points)
+        except AttributeError:
+            pass
 
     def resize(self, difference):
         output("Gui: Resizing...", "complete")

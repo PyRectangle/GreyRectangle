@@ -15,6 +15,9 @@ class Graphic:
         self.textX = textX
         self.textY = textY
         self.window = window
+        self.x = 0
+        self.y = 0
+        self.textAlpha = 255
         self.renderVertices = []
 
     def toggle(self):
@@ -74,11 +77,16 @@ class Graphic:
         self.renderVertices = []
         for vertex in self.vertices:
             tmp = []
+            coords = [self.x, self.y]
             for i in range(2):
-                tmp.append(vertex[i] + self.point[i])
+                if vertex[i] == 1440:
+                    tmp.append(vertex[i] + self.point[i])
+                else:
+                    tmp.append(vertex[i] + self.point[i] + coords[i])
             self.renderVertices.append(tmp)
 
     def render(self):
         pygame.draw.polygon(self.window.surface, self.color, self.renderVertices)
         if self.text != None:
-            self.window.render.text(*self.text, self.window.surface, self.textX + self.point[0], self.textY + self.point[1], True)
+            self.window.render.text(*self.text, surface = self.window.surface, x = self.textX + self.point[0] + self.x, y = self.textY + self.point[1] + self.y, blit = True,
+                                    alpha = self.textAlpha)

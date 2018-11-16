@@ -8,7 +8,7 @@ import pygame
 
 class Window:
     def __init__(self, title = "PyGame Window", frameSize = (800, 450), surfaceSize = (1920, 1080), flags = 0,
-                 autoResizing = True, fullscreen = False):
+                 autoResizing = True, fullscreen = False, icon = None):
         output("Window: Initializing pygame...", "debug")
         pygame.init()
         output("Window: Setting title, start size, flags and window resolution multiplier...", "debug")
@@ -30,6 +30,7 @@ class Window:
         self.autoResizing = autoResizing
         self.fps = 0
         self.dt = 0
+        self.fpsLimit = 0
         output("Window: Creating gui handler object...", "debug")
         self.guiChanger = K_TAB
         self.guiPresser = K_RETURN
@@ -48,6 +49,10 @@ class Window:
         self.screen = pygame.display.set_mode(self.START_FRAME_SIZE, self.flags)
         output("Window: Setting the caption to " + self.__title + "...", "debug")
         pygame.display.set_caption(self.__title)
+        self.icon = icon
+        self.screenSurfaces = []
+        if icon != None:
+            pygame.display.set_icon(pygame.image.load(icon).convert())
         if fullscreen:
             self.toggleFullscreen()
     
@@ -125,7 +130,7 @@ class Window:
     
     def updateClock(self):
         output("Window: Getting FPS and delta time...", "complete")
-        self.clock.tick(0)
+        self.clock.tick(self.fpsLimit)
         self.fps = self.clock.get_fps()
         self.dt = self.clock.get_time()
 
@@ -146,12 +151,24 @@ class Window:
     def startDisplay(self):
         output("Window: Starting display...", "complete")
         self.screen = pygame.display.set_mode(self.size, self.flags)
+    
+    def getScreenCoords(self, x, y):
+        x *= self.__surfaceSize[0] / self.START_SURFACE_SIZE[0]
+        y *= self.__surfaceSize[1] / self.START_SURFACE_SIZE[1]
+        x += self.__surfaceX
+        y += self.__surfaceY
+        return x, y
+    
+    def onOptionalSurfaceRender(self):
+        pass
 
     def updateDisplay(self):
         output("Window: Updating display...", "complete")
         self.screen.fill((0, 0, 0))
-        self.screen.blit(pygame.transform.scale(self.surface, tuple(self.__surfaceSize)), (self.__surfaceX,
-                                                                                           self.__surfaceY))
+        self.screen.blit(pygame.transform.scale(self.surface, tuple(self.__surfaceSize)), (self.__surfaceX, self.__surfaceY))
+        for surface in self.screenSurfaces:
+            self.screen.blit(surface, (0, 0))
+            self.onOptionalSurfaceRender()
         pygame.display.update()
 
     def toggleFullscreen(self):

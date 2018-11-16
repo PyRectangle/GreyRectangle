@@ -1,0 +1,29 @@
+{
+    "Controls": {
+        "DebugScreen": 282,
+        "Escape": 27,
+        "FullScreen": 292,
+        "GuiChanger": 9,
+        "GuiPresser": 13,
+        "ScreenShot": 283,
+        "goDown": 274,
+        "goLeft": 276,
+        "goRight": 275,
+        "goUp": 273
+    },
+    "ControlsDescription": {
+        "DebugScreen": "Show debug information:",
+        "Escape": "Quit level:",
+        "FullScreen": "Toggle full screen:",
+        "GuiChanger": "Change the selected gui element:",
+        "GuiPresser": "Press the selected gui element:",
+        "ScreenShot": "Make a screen shot:",
+        "goDown": "Go down:",
+        "goLeft": "Go left:",
+        "goRight": "Go right:",
+        "goUp": "Go up:"
+    },
+    "DebugScreenActive": false,
+    "FPSLimit": 0,
+    "Volume": 100
+}

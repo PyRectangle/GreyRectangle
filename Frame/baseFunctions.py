@@ -14,5 +14,4 @@ def output(text, level="info"):
     underCompleteLevel = level == "info" or level == "debug"
     if level == "info" and info or debug and underCompleteLevel or completeDebug:
         currentTime = time.localtime()
-        print("[" + str(currentTime.tm_hour) + ":" + str(currentTime.tm_min) + ":" + str(currentTime.tm_sec) + "] " +
-              text)
+        print("[" + str(currentTime.tm_hour) + ":" + str(currentTime.tm_min) + ":" + str(currentTime.tm_sec) + "] " + text)

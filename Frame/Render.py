@@ -7,7 +7,8 @@ class Render:
         output("Render: Creating render object...", "debug")
         self.window = window
 
-    def text(self, file, size, text, antialias, color, background, surface, x = None, y = None, blit = True, width = None, height = None, addX = 0, addY = 0):
+    def text(self, file, size, text, antialias, color, background, surface, x = None, y = None, blit = True, width = None, height = None, addX = 0, addY = 0,
+             alpha = 255):
         output("Render: Rendering \"" + text + "\"...", "complete")
         textSurface = pygame.font.Font(file, size).render(text, antialias, color, background)
         if x == None or y == None:
@@ -19,6 +20,19 @@ class Render:
             else:
                 x = width / 2 - textSurface.get_width() / 2
                 y = height / 2 - textSurface.get_height() / 2
+        if alpha != 255:
+            textSurfaceAlpha = pygame.Surface((textSurface.get_width(), textSurface.get_height()))
+            otherColor = []
+            for i in color:
+                rgb = i + 127.5
+                while rgb > 255:
+                    rgb -= 255
+                otherColor.append(rgb)
+            textSurfaceAlpha.fill(otherColor)
+            textSurfaceAlpha.set_colorkey(otherColor)
+            textSurfaceAlpha.blit(textSurface, (0, 0))
+            textSurfaceAlpha.set_alpha(alpha)
+            textSurface = textSurfaceAlpha
         if blit:
             if surface == None:
                 surface = self.window.surface

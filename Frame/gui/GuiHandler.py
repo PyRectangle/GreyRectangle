@@ -11,6 +11,7 @@ class GuiHandler:
         self.window = window
         self.wasPressed = False
         self.clickAnim = None
+        self.volume = 1
     
     def createClickAnim(self, button):
         output("GuiHandler: Creating click animation for " + button.text + "...", "debug")
@@ -62,5 +63,8 @@ class GuiHandler:
                     gui.touchable = False
         if self.clickAnim != None:
             self.clickAnim.update()
-            if self.clickAnim.finished:
-                self.clickAnim = None
+            if self.clickAnim != None:
+                if self.clickAnim.finished:
+                    self.clickAnim = None
+        for gui in self.allGuis:
+            gui.setVolume(self.volume)
