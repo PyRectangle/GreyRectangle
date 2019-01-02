@@ -2,5 +2,10 @@
     "SpawnX": 0,
     "SpawnY": 1,
     "Lifes": 10,
+    "JumpTime": 0.2,
+    "JumpHeight": 1.5,
+    "WalkSpeed": 1,
+    "FallSpeed": 1,
+    "FallSpeedMultiplier": 1.003,
     "Description": "The third level"
 }

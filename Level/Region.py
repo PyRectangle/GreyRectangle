@@ -1,18 +1,29 @@
+"""
+block attributes are
+0 Rotation (0, 1, 2, 3)
+1 Solid (0, 1)
+2 Death (0, 1)
+[0, 1, 2]
+"""
+
 import threading
 import gzip
+import os
 
 
-class Region(threading.Thread):
-    def __init__(self, level, number, x, y):
-        threading.Thread.__init__(self)
+class Region():
+    def __init__(self, level, number, x, y, withoutLevel = False, file = ""):
         self.x = x
         self.y = y
-        self.file = level.folder + "/region" + str(number) + "/" + str(x) + "-" + str(y) + ".rgn"
+        if withoutLevel:
+            self.file = file
+        else:
+            self.file = level.folder + "/region" + str(number) + "/" + str(x) + "-" + str(y) + ".rgn"
         self.loaded = False
         self.loading = False
     
-    def run(self):
-        self.load()
+    def start(self):
+        threading.Thread(target = self.load).start()
 
     def load(self):
         self.loading = True
@@ -52,10 +63,14 @@ class Region(threading.Thread):
         self.loading = False
 
     def close(self):
-        for i in range(len(self.region) - 1):
-            del self.region[0]
-        del self.region
-        self.loaded = False
+        if self.loaded:
+            for i in range(len(self.region)):
+                del self.region[0]
+            del self.region
+            self.loaded = False
+    
+    def delete(self):
+        os.remove(self.file)
     
     def save(self):
         if self.loaded:

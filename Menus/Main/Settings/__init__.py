@@ -16,6 +16,8 @@ class Settings(Menu):
                              0.1, True, [0, 1], None, SOUNDS, menuHandler.window))
         self.addGui(Slider, (menuHandler.getVolume, (200, 200, 200), 60, 360, 800, 120, "Volume", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True,
                              30, 30, 0.1, True, [0, 1], None, SOUNDS, menuHandler.window))
+        self.addGui(Button, (menuHandler.window.resize, (WINDOW_SIZE, True, True), 60, 500, 1150, 120, "Reset Window Size", (100, 100, 100), (0, 0, 0), (100, 100, 255),
+                             (0, 0, 0), FONT, True, 30, 30, 0.1, True, [0, 1], None, SOUNDS, menuHandler.window))
 
     def create(self):
         super().create()

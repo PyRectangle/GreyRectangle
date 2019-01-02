@@ -1,3 +1,4 @@
+from Editor.Actions import Actions
 from Constants import *
 
 
@@ -45,8 +46,10 @@ class View:
                 self.closeLevelSelection()
                 if self.main.menuHandler.editor:
                     self.main.editing = True
+                    self.main.editor.actions = Actions(self.level, self.main)
                 else:
                     self.main.playing = True
+                    self.main.player.first = True
                 self.main.camera.setProps(self.level)
             else:
                 self.closeLevelSelection()
@@ -96,7 +99,16 @@ class View:
                     renderY = self.main.editor.y
             if self.opened:
                 self.level.render.blocks(renderX, renderY, self.size)
+                if self.main.menuHandler.editor:
+                    self.level.render.grid(renderX, renderY, self.size)
             elif self.useBlockWidth:
                 self.level.render.blocks(renderX, renderY, self.size, self.main.camera.size)
+                if self.main.menuHandler.editor:
+                    self.level.render.grid(renderX, renderY, self.main.camera.size, self.size)
             else:
                 self.level.render.blocks(renderX, renderY, self.size, VIEW_DISTANCE)
+                if self.main.menuHandler.editor:
+                    self.level.render.grid(renderX, renderY, VIEW_DISTANCE, self.size)
+        if not self.main.editing:
+            self.main.player.update(False)
+            self.main.player.render()

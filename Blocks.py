@@ -10,7 +10,9 @@ class Blocks:
         files.sort()
         self.blocks = []
         for file in files:
-            self.blocks.append(Block(file))
+            self.blocks.append(None)
+        for file in files:
+            self.blocks[int(list(file)[0])] = Block(file)
         self.resizeTextures((144, 144))
     
     def resizeTextures(self, size):

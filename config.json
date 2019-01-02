@@ -5,7 +5,9 @@
         "FullScreen": 292,
         "GuiChanger": 9,
         "GuiPresser": 13,
+        "Jump": 32,
         "ScreenShot": 283,
+        "Zoom": 304,
         "goDown": 274,
         "goLeft": 276,
         "goRight": 275,
@@ -13,11 +15,13 @@
     },
     "ControlsDescription": {
         "DebugScreen": "Show debug information:",
-        "Escape": "Quit level:",
+        "Escape": "Quit:",
         "FullScreen": "Toggle full screen:",
         "GuiChanger": "Change the selected gui element:",
         "GuiPresser": "Press the selected gui element:",
+        "Jump": "Jump:",
         "ScreenShot": "Make a screen shot:",
+        "Zoom": "Zoom in editor:",
         "goDown": "Go down:",
         "goLeft": "Go left:",
         "goRight": "Go right:",
@@ -25,5 +29,6 @@
     },
     "DebugScreenActive": false,
     "FPSLimit": 0,
+    "UseBusyLoop": true,
     "Volume": 100
 }

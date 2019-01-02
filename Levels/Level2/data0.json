@@ -1,6 +1,11 @@
 {
-    "SpawnX": 0,
+    "SpawnX": 10,
     "SpawnY": 1,
     "Lifes": 10,
+    "JumpTime": 0.2,
+    "JumpHeight": 1.5,
+    "WalkSpeed": 1,
+    "FallSpeed": 1,
+    "FallSpeedMultiplier": 1.003,
     "Description": "The second level"
 }

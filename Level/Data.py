@@ -12,14 +12,17 @@ class Data:
         files = os.listdir(level.folder + "/region" + str(number))
         files.sort()
         self.smallest = self.getCoords(files[-1])
+        self.biggest = self.getCoords(files[-1])
         for file in files:
             coords = self.getCoords(file)
             for i in range(2):
                 if coords[i] < self.smallest[i]:
                     self.smallest[i] = coords[i]
-        for y in range(int(self.getCoords(files[-1])[1]) + 1 - self.smallest[1]):
+                if coords[i] > self.biggest[i]:
+                    self.biggest[i] = coords[i]
+        for y in range(self.biggest[1] + 1 - self.smallest[1]):
             line = []
-            for x in range(int(self.getCoords(files[-1])[0]) + 1 - self.smallest[0]):
+            for x in range(self.biggest[0] + 1 - self.smallest[0]):
                 line.append(None)
             self.regionsGrid.append(line)
         for file in files:
@@ -44,16 +47,24 @@ class Data:
                 coord += char
 
     def load(self):
-        file = open(self.level.folder + "/data" + str(self.number) + ".json", "rb")
+        file = open(self.level.folder + "/data" + str(self.number) + ".json", "r")
         self.jsonData = json.load(file)
         file.close()
+        self.loadJsonData()
+    
+    def loadJsonData(self):
         self.spawnX = self.jsonData["SpawnX"] - self.smallest[0] * 16
         self.spawnY = self.jsonData["SpawnY"] - self.smallest[1] * 16
         self.lifes = self.jsonData["Lifes"]
+        self.jumpTime = self.jsonData["JumpTime"]
+        self.jumpHeight = self.jsonData["JumpHeight"]
+        self.walkSpeed = self.jsonData["WalkSpeed"]
+        self.fallSpeed = self.jsonData["FallSpeed"]
+        self.fallSpeedMultiplier = self.jsonData["FallSpeedMultiplier"]
         self.description = self.jsonData["Description"]
 
     def save(self):
-        file = open(self.level.folder + "/data" + str(self.number) + ".json", "wb")
+        file = open(self.level.folder + "/data" + str(self.number) + ".json", "w")
         file.write(json.dumps(self.jsonData, sort_keys = True, indent = 4))
         file.close()
     

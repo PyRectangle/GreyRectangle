@@ -1,12 +1,13 @@
 from Level.Render import Render
 from Level.Data import Data
+from Constants import *
 import os
 
 
 class Level:
     def __init__(self, folder, main):
         self.name = folder
-        self.folder = "Levels/" + folder
+        self.folder = LEVEL_PATH + "/" + folder
         self.dataFiles = []
         files = os.listdir(self.folder)
         for file in files:

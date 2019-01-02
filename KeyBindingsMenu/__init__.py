@@ -20,6 +20,7 @@ class KeyBindingsMenu:
             binding.remove()
     
     def update(self):
+        self.main.window.guiEscape = self.main.config.config["Controls"]["Escape"]
         for binding in self.bindings:
             binding.update()
     

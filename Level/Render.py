@@ -57,12 +57,38 @@ class Render:
                 except IndexError:
                     pass
 
-    def block(self, block, x, y):
-        texture = self.main.blocks.blocks[block[0]].resizedTexture
-        if texture != None:
-            self.window.surface.blit(texture, (x, y))
+    def rotate(self, texture, attribute):
+        angle = attribute * 90
+        return pygame.transform.rotate(texture, angle)
     
-    def grid(self, x, y, distance = BLOCK_SIZE):
+    def mix(self, texture, color, factor, lineWidth):
+        if bool(factor):
+            width = texture.get_width()
+            height = texture.get_height()
+            surface = pygame.Surface((width, height))
+            surface.fill((0, 0, 0))
+            surface.set_colorkey((0, 0, 0))
+            pygame.draw.polygon(surface, color, [[0, 0], [width, 0], [width, height], [0, height]], lineWidth)
+            texture.blit(surface, (0, 0))
+        return texture
+
+    def block(self, block, x, y, bigger = False, useNormalTexture = False):
+        if useNormalTexture:
+            texture = self.main.blocks.blocks[block[0]].texture
+        else:
+            texture = self.main.blocks.blocks[block[0]].resizedTexture
+        if block[1] != [] and texture != None:
+            texture = self.rotate(texture, int(block[1][0]))
+            if self.main.editing:
+                texture = self.mix(texture, (255, 0, 0), int(block[1][2]), 20)
+                texture = self.mix(texture, (255, 255, 255), 1 - int(block[1][1]), 10)
+        if texture != None:
+            if not bigger:
+                self.window.surface.blit(texture, (x, y))
+            else:
+                self.window.surface.blit(pygame.transform.scale(texture, (164, 164)), (x - 10, y - 10))
+    
+    def grid(self, x, y, distance = BLOCK_SIZE, size = None):
         distance = int(distance)
         surface = pygame.Surface(self.window.size)
         surface.fill((255, 255, 255))
@@ -77,6 +103,8 @@ class Render:
         startPosY = (y - int(y)) * -distance
         sizeX = blocksX * distance
         sizeY = blocksY * distance
+        if size == None:
+            size = distance
         blitStartPosX = -(list(self.window.START_SURFACE_SIZE)[0] - sizeX) / 2
         blitStartPosY = -(list(self.window.START_SURFACE_SIZE)[1] - sizeY) / 2
         for blockY in range(blocksY):
@@ -84,19 +112,20 @@ class Render:
                 blitPosX = startPosX + blockX * distance - blitStartPosX
                 blitPosY = startPosY + blockY * distance - blitStartPosY
                 screenBlitPosX, screenBlitPosY = self.window.getScreenCoords(blitPosX, blitPosY)
-                pygame.draw.lines(surface, (0, 0, 0), False, [[screenBlitPosX + distance, screenBlitPosY], [screenBlitPosX, screenBlitPosY],
-                                                              [screenBlitPosX, screenBlitPosY + distance]])
+                pygame.draw.lines(surface, (0, 0, 0), False, [[screenBlitPosX + size, screenBlitPosY], [screenBlitPosX, screenBlitPosY],
+                                                              [screenBlitPosX, screenBlitPosY + size]])
         for gui in self.window.guiHandler.allGuis:
             x1, y1 = self.window.getScreenCoords(gui.x, gui.y)
             x2, y2 = self.window.getScreenCoords(gui.x + gui.width, gui.y + gui.height)
             pygame.draw.polygon(surface, (255, 255, 255), [[x1, y1], [x2, y1], [x2, y2], [x1, y2]])
-        for graphic in self.main.levelSelection.graphics:
-            if graphic.isOpen or graphic.isChanging:
-                vertices = []
-                for vertex in graphic.renderVertices:
-                    coords = self.window.getScreenCoords(vertex[0], vertex[1])
-                    vertices.append([coords[0], coords[1]])
-                pygame.draw.polygon(surface, (255, 255, 255), vertices)
+        for graphics in self.main.levelSelection.graphics, self.main.editor.blockSelection.graphics:
+            for graphic in graphics:
+                if graphic.isOpen or graphic.isChanging:
+                    vertices = []
+                    for vertex in graphic.renderVertices:
+                        coords = self.window.getScreenCoords(vertex[0], vertex[1])
+                        vertices.append([coords[0], coords[1]])
+                    pygame.draw.polygon(surface, (255, 255, 255), vertices)
         if self.window.screenSurfaces == []:
             self.window.screenSurfaces.append(surface)
         else:

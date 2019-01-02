@@ -6,6 +6,14 @@ class Render:
     def __init__(self, window):
         output("Render: Creating render object...", "debug")
         self.window = window
+    
+    def getTextSizeForWidth(self, text, startSize, width, font):
+        size = startSize
+        textWidth = list(pygame.font.Font(font, size).size(text))[0]
+        while textWidth > width:
+            size -= 1
+            textWidth = list(pygame.font.Font(font, size).size(text))[0]
+        return size
 
     def text(self, file, size, text, antialias, color, background, surface, x = None, y = None, blit = True, width = None, height = None, addX = 0, addY = 0,
              alpha = 255):

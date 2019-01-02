@@ -1,6 +1,7 @@
 from Level.LevelHandler import LevelHandler
 from KeyBindingsMenu import KeyBindingsMenu
 from LevelSelection import LevelSelection
+from WarningHandler import WarningHandler
 from MenuHandler import MenuHandler
 from DebugScreen import DebugScreen
 from Level.View import View
@@ -10,6 +11,7 @@ from Camera import Camera
 from Window import Window
 from Config import Config
 from Blocks import Blocks
+from Constants import *
 import pygame
 import Frame
 import time
@@ -20,11 +22,15 @@ class Main:
     def __init__(self):
         self.config = Config()
         self.config.load()
-        self.window = Window(self, "GreyRectangle", (640, 480), (1440, 1080), flags = Frame.RESIZABLE | Frame.HWSURFACE | Frame.HWPALETTE | Frame.HWACCEL,
-                             icon = "resources/images/icon.png")
+        self.icon = pygame.Surface((32, 32))
+        self.icon.set_colorkey((0, 0, 0))
+        pygame.draw.polygon(self.icon, (150, 150, 150), [[8, 0], [8, 32], [24, 32], [24, 0]])
+        self.window = Window(self, "GreyRectangle", WINDOW_SIZE, SURFACE_SIZE, flags = Frame.RESIZABLE | Frame.HWSURFACE | Frame.HWPALETTE | Frame.HWACCEL,
+                             icon = self.icon)
         self.menuHandler = MenuHandler(self)
         self.menuHandler.create()
         self.menuHandler.show(self.menuHandler.mainMenu)
+        self.warningHandler = WarningHandler(self.window)
         self.levelHandler = LevelHandler(self)
         self.levelSelection = LevelSelection(self)
         self.keyBindingsMenu = KeyBindingsMenu(self)
@@ -35,8 +41,10 @@ class Main:
         self.debugScreen = DebugScreen(self.window)
         self.window.guiChanger = self.config.config["Controls"]["GuiChanger"]
         self.window.guiPresser = self.config.config["Controls"]["GuiPresser"]
+        self.window.guiEscape = self.config.config["Controls"]["Escape"]
         self.debugScreenActive = self.config.config["DebugScreenActive"]
         self.window.fpsLimit = self.config.config["FPSLimit"]
+        self.window.useBusyLoop = self.config.config["UseBusyLoop"]
         self.menuHandler.getVolume(self.config.config["Volume"])
         self.blocks = Blocks()
         self.playing = False
@@ -60,6 +68,7 @@ class Main:
                 self.debugScreenActive = not self.debugScreenActive
             self.window.update()
             self.menuHandler.update()
+            self.warningHandler.update()
             self.window.surface.fill((255, 255, 255))
             if self.playing and not self.levelPreview.shouldRender:
                 self.camera.update()
@@ -76,7 +85,10 @@ class Main:
                 self.levelPreview.update()
                 self.levelPreview.render()
                 updatedPreview = True
-            if self.menuHandler.levelSelection.createdGuis != [] or not self.levelSelection.closed or self.menuHandler.goToPlay:
+            if self.menuHandler.levelSelection.createdGuis != [] or self.menuHandler.levelSelectionEdit.createdGuis != [] or not self.levelSelection.closed or \
+               self.menuHandler.goToPlay:
+                self.player.update(False)
+                self.player.render()
                 if not updatedPreview:
                     self.levelPreview.update()
                 self.levelSelection.update()
@@ -86,6 +98,8 @@ class Main:
                 self.keyBindingsMenu.update()
                 self.keyBindingsMenu.render()
             self.menuHandler.render()
+            if self.warningHandler.isActive:
+                self.warningHandler.render()
             if self.debugScreenActive:
                 self.debugScreen.render()
             self.window.updateDisplay()

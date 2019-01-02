@@ -1,0 +1,6 @@
+{
+    "Name": "Dirt",
+    "Texture": "dirt.png",
+    "Solid": true,
+    "Death": false
+}

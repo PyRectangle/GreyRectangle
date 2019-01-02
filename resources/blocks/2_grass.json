@@ -1,0 +1,6 @@
+{
+    "Name": "Grass",
+    "Texture": "grass.png",
+    "Solid": true,
+    "Death": false
+}

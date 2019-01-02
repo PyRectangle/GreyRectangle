@@ -8,9 +8,10 @@ class Block:
         file = open(BLOCK_PATH + "/" + jsonFile)
         self.json = json.load(file)
         file.close()
+        self.name = self.json["Name"]
         self.texture = self.getValue("Texture")
         self.solid = self.json["Solid"]
-        self.dead = self.json["Dead"]
+        self.death = self.json["Death"]
         self.animation = self.getValue("Animation")
         if self.texture == "":
             self.texture = None

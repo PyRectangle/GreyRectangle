@@ -1,4 +1,5 @@
 from LevelSelection.Graphic import Graphic
+from Frame.Render import Render
 from Constants import *
 import math
 
@@ -27,11 +28,13 @@ class LevelGui:
         self.levelIndex = self.levelCount
         self.wasSelected = False
         self.pressed = False
+        self.renderObj = Render(self.window)
+        size = self.renderObj.getTextSizeForWidth(self.level.data.description, 40, 390, FONT)
         self.graphics = [Graphic(LEVEL_GUI_COLOR, [[1440, 360], [975, 360], [900, 510], [975, 660], [1440, 660], [1440, 610], [1000, 610], [950, 510], [1000, 410],
                                               [1440, 410]], [800, 0], 1, window),
                          Graphic((120, 120, 120), [[1440, 410], [1000, 410], [950, 510], [1000, 610], [1440, 610]], [800, 0], 1, window,
-                                 (FONT, 140, self.level.name, True, (0, 0, 0), None), 1000, 420),
-                         Graphic((120, 120, 120), [[1440, 410], [1440, 410], [1440, 410]], [800, 0], 1, window, (FONT, 40, self.level.data.description, True,
+                                 (FONT, self.renderObj.getTextSizeForWidth(self.level.name, 140, 440, FONT), self.level.name, True, (0, 0, 0), None), 1000, 420),
+                         Graphic((120, 120, 120), [[1440, 410], [1440, 410], [1440, 410]], [800, 0], 1, window, (FONT, size, self.level.data.description, True,
                                                                                                                  (0, 0, 0), None), 1050, 565)]
 
     def rotate(self):

@@ -17,6 +17,9 @@ class Camera:
         self.stopLeft = 4.5
         self.stopDown = 1440
         self.stopRight = 1080
+        self.stopped = False
+        self.stopX = False
+        self.stopY = False
         self.size = BLOCK_SIZE
     
     def setStops(self, level, anyways = False):
@@ -28,6 +31,9 @@ class Camera:
         if self.main.editing:
             self.editor.x = level.data.spawnX
             self.editor.y = level.data.spawnY
+            self.editor.edit = None
+            self.editor.selectedBlock = 0
+            self.editor.steps = []
         elif self.main.playing:
             self.player.x = level.data.spawnX
             self.player.y = level.data.spawnY
@@ -38,6 +44,11 @@ class Camera:
         self.y = level.data.spawnY
         self.setCoords(level)
         self.setStops(level)
+        if not self.main.menuHandler.editor:
+            self.player.alpha = 0
+            self.player.alphaUp = True
+            self.player.alphaMove = True
+            self.player.getPixelCoords()
     
     def updateCoord(self, player, this, speed):
         if player > this:
@@ -60,22 +71,37 @@ class Camera:
         if bigger:
             if coord > stop:
                 coord = stop
+                self.stopped = True
         else:
             if coord < stop:
                 coord = stop
+                self.stopped = True
         return coord
 
-    def update(self):
-        if self.main.editing:
-            self.speedX = self.getDifference(self.x, self.editor.x) / CAMERA_FREE_MOVE_PIXELS_EDITOR
-            self.speedY = self.getDifference(self.y, self.editor.y) / CAMERA_FREE_MOVE_PIXELS_EDITOR
-            self.x = self.updateCoord(self.editor.x, self.x, self.speedX)
-            self.y = self.updateCoord(self.editor.y, self.y, self.speedY)
-        elif self.main.playing:
-            self.speedX = self.getDifference(self.x, self.player.x) / CAMERA_FREE_MOVE_PIXELS
-            self.speedY = self.getDifference(self.y, self.player.y) / CAMERA_FREE_MOVE_PIXELS
-            self.x = self.stop(self.stopRight, self.stop(self.stopLeft, self.updateCoord(self.player.x, self.x, self.speedX), False), True)
-            self.y = self.stop(self.stopDown, self.stop(self.stopUp, self.updateCoord(self.player.y, self.y, self.speedY), False), True)
+    def update(self, onlyStops = False):
+        self.stopped = False
+        if onlyStops:
+            self.x = self.stop(self.stopRight, self.stop(self.stopLeft, self.x, False), True)
+            self.stopX = self.stopped
+            self.stopped = False
+            self.y = self.stop(self.stopDown, self.stop(self.stopUp, self.y, False), True)
+            self.stopY = self.stopped
+        else:
+            if self.main.editing:
+                self.x = self.editor.x
+                self.y = self.editor.y
+            elif self.main.playing:
+                self.speedX = self.getDifference(self.x, self.player.x) / CAMERA_FREE_MOVE_PIXELS
+                self.speedY = self.getDifference(self.y, self.player.y) / CAMERA_FREE_MOVE_PIXELS
+                if self.speedX * CAMERA_FREE_MOVE_PIXELS <= BLOCK_PIX:
+                    self.speedX = self.getDifference(self.x, self.player.x)
+                if self.speedY * CAMERA_FREE_MOVE_PIXELS <= BLOCK_PIX:
+                    self.speedY = self.getDifference(self.y, self.player.y)
+                self.x = self.stop(self.stopRight, self.stop(self.stopLeft, self.updateCoord(self.player.x, self.x, self.speedX), False), True)
+                self.stopX = self.stopped
+                self.stopped = False
+                self.y = self.stop(self.stopDown, self.stop(self.stopUp, self.updateCoord(self.player.y, self.y, self.speedY), False), True)
+                self.stopY = self.stopped
     
     def render(self):
         if self.level != None:

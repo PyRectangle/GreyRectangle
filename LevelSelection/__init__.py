@@ -1,5 +1,6 @@
 from LevelSelection.LevelGuiHandler import LevelGuiHandler
 from LevelSelection.Graphic import Graphic
+from Frame.Render import Render
 from Constants import *
 
 
@@ -11,6 +12,7 @@ class LevelSelection:
         self.toggleClosed = True
         self.textAlpha = 255
         self.textAlphaUp = False
+        self.renderObj = Render(self.window)
         self.text = "Levelinfo"
         self.showText = "Levelinfo"
         self.levelGuiHandler = LevelGuiHandler(main.levelHandler.levelObjs, main)
@@ -42,7 +44,7 @@ class LevelSelection:
                 self.textAlpha = 0
                 self.text = self.showText
                 self.textAlphaUp = True
-                self.graphics[1].text = (FONT, 50, self.text, True, (0, 0, 0), None)
+                self.graphics[1].text = (FONT, self.renderObj.getTextSizeForWidth(self.text, 80, 450, FONT), self.text, True, (0, 0, 0), None)
         elif self.textAlpha != 255:
             self.textAlphaUp = True
         if self.textAlphaUp:

@@ -25,7 +25,10 @@ class Gui:
         self.sounds = []
         for sound in sounds:
             if sound != None:
-                self.sounds.append(pygame.mixer.Sound(sound))
+                try:
+                    self.sounds.append(pygame.mixer.Sound(sound))
+                except (pygame.error, AttributeError):
+                    self.sounds = None
         self.volume = 1
         self.pressed = False
         self.wasPressedGui = False
@@ -35,8 +38,7 @@ class Gui:
         self.pressDifference = pressDifference
         self.aspectRatio = self.height / self.width
         self.startCoords = [self.x, self.y, self.width, self.height]
-        self.pressCoords = [self.x - self.pressDifference, self.y - self.pressDifference * self.aspectRatio,
-                            self.width + self.pressDifference * 2,
+        self.pressCoords = [self.x - self.pressDifference, self.y - self.pressDifference * self.aspectRatio, self.width + self.pressDifference * 2,
                             self.height + self.pressDifference * self.aspectRatio * 2]
         self.last = -1
         self.step = 0
@@ -130,15 +132,16 @@ class Gui:
         self.pressedMouse = self.mouseTouchesButton and self.window.mousePressed != (0, 0, 0)
         self.pressed = self.pressedKey or self.pressedMouse
         if not self.wasPressedGui and self.pressed:
-            if self.sounds[1] != None:
+            if self.sounds != None:
                 output("Gui: Playing gui click sound...", "debug")
                 self.sounds[1].play()
         output("Gui: Is pressed: " + str(self.pressed), "complete")
         self.wasPressedGui = self.pressed
 
     def setVolume(self, volume):
-        for sound in self.sounds:
-            sound.set_volume(volume)
+        if self.sounds != None:
+            for sound in self.sounds:
+                sound.set_volume(volume)
     
     def delete(self):
         self.rightCoords = False
@@ -152,11 +155,23 @@ class Gui:
             pygame.draw.polygon(self.window.surface, self.selectColor, points)
         else:
             pygame.draw.polygon(self.window.surface, self.color, points)
+        try:
+            if self.writable:
+                pygame.draw.polygon(self.window.surface, self.lineEditColor, points)
+        except AttributeError:
+            pass
+        try:
+            if not self.writable and self.text == "":
+                self.renderObj.text(self.fontFile, int(self.textSize + self.height - self.startCoords[3]), self.enterText, self.antialias, self.textColor, None,
+                                    self.window.surface, width = self.width, height = self.height, addX = self.x, addY = self.y)
+            else:
+                self.renderLineEdit()
+        except AttributeError:
+            self.renderObj.text(self.fontFile, int(self.textSize + self.height - self.startCoords[3]), self.text, self.antialias, self.textColor, None,
+                                self.window.surface, width = self.width, height = self.height, addX = self.x, addY = self.y)
         pygame.draw.lines(self.window.surface, self.frameColor, 4, [[self.x, self.y], [self.x + self.width, self.y],
                                                                     [self.x + self.width, self.y + self.height], [self.x, self.y + self.height],
                                                                     [self.x, self.y]], 1)
-        self.renderObj.text(self.fontFile, int(self.textSize + self.height - self.startCoords[3]), self.text, self.antialias, self.textColor, None,
-                            self.window.surface, width = self.width, height = self.height, addX = self.x, addY = self.y)
         try:
             pixPos = self.width / 100 * self.pos + self.x
             width = self.width / 100

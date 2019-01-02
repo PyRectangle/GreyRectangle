@@ -1,0 +1,6 @@
+{
+    "Name": "Stone",
+    "Texture": "stone.png",
+    "Solid": true,
+    "Death": false
+}
