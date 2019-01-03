@@ -57,6 +57,9 @@
 - Added level create / delete buttons
 - Added menu to access settings while editing and for quitting
 - Added block setting with automatic level resizing
+- Added block selection
+- Added block attributes
+- Added spawn setting
 ## Main
 - Added block loading
 - Added a configuration file
@@ -65,6 +68,3 @@
 - Added a menu handling system
 - Added an exit animation
 - Added config saving when exiting
-- Added block selection
-- Added block attributes
-- Added spawn setting
