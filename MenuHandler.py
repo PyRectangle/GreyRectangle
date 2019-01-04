@@ -3,7 +3,9 @@ from Menus.Main.LevelSelectionEdit.CreateLevel import CreateLevel
 from Menus.Main.LevelSelectionEdit import LevelSelectionEdit
 from Menus.Main.Settings.VideoSettings import VideoSettings
 from Menus.Main.Settings.KeyBindings import KeyBindings
+from Menus.Main.LevelSelectionEdit.Rename import Rename
 from Menus.Main.LevelSelection import LevelSelection
+from Menus.Main.LevelOptions import LevelOptions
 from Menus.Main.ActionMenu import ActionMenu
 from Menus.Main.Settings import Settings
 from Menus.Main.PlayQuit import PlayQuit
@@ -11,6 +13,7 @@ from Menus.Main.EditQuit import EditQuit
 from Frame.gui.Button import Button
 from Frame.Render import Render
 from Menus.Main import MainMenu
+from Menus.Main.Ask import Ask
 from Constants import *
 from Menu import Menu
 import pygame
@@ -47,15 +50,32 @@ class MenuHandler:
         self.levelSelectionEdit = LevelSelectionEdit(self)
         self.createLevelMenu = CreateLevel(self)
         self.deleteLevelMenu = DeleteLevel(self)
+        self.levelOptions = LevelOptions(self)
+        self.ask = Ask(self)
+        self.rename = Rename(self)
         self.menus = [self.mainMenu, self.levelSelection, self.settings, self.keyBindings, self.videoSettings, self.playQuit, self.editQuit, self.levelSelectionEdit,
-                      self.createLevelMenu, self.deleteLevelMenu, self.actionMenu]
+                      self.createLevelMenu, self.deleteLevelMenu, self.actionMenu, self.levelOptions, self.ask, self.rename]
+    
+    def showLevelOptions(self):
+        self.levelOptions.do = True
+        self.levelOptions.up = True
+        self.show(self.levelOptions)
+
+    def showEditQuit(self):
+        self.levelOptions.do = True
+        self.levelOptions.up = False
+        self.show(self.editQuit)
+
+    def showEditQuitSave(self):
+        if self.levelOptions.setOptions():
+            self.showEditQuit()
 
     def setSpawn(self):
         self.main.editor.setSpawn = True
 
     def rotateBlocks(self):
         if self.main.editor.blockSelection.data == []:
-            block = self.main.blocks.blocks[self.main.editor.selectedBlock + 1]
+            block = self.main.blocks.blocks[self.main.editor.selectedBlock]
             self.main.editor.blockSelection.data = [1, int(block.solid), int(block.death)]
         else:
             self.main.editor.blockSelection.data[0] += 1
@@ -64,14 +84,14 @@ class MenuHandler:
     
     def toggleSolid(self):
         if self.main.editor.blockSelection.data == []:
-            block = self.main.blocks.blocks[self.main.editor.selectedBlock + 1]
+            block = self.main.blocks.blocks[self.main.editor.selectedBlock]
             self.main.editor.blockSelection.data = [0, int(not block.solid), int(block.death)]
         else:
             self.main.editor.blockSelection.data[1] = int(not bool(self.main.editor.blockSelection.data[1]))
     
     def toggleDeath(self):
         if self.main.editor.blockSelection.data == []:
-            block = self.main.blocks.blocks[self.main.editor.selectedBlock + 1]
+            block = self.main.blocks.blocks[self.main.editor.selectedBlock]
             self.main.editor.blockSelection.data = [0, int(block.solid), int(not block.death)]
         else:
             self.main.editor.blockSelection.data[2] = int(not bool(self.main.editor.blockSelection.data[2]))
@@ -101,6 +121,15 @@ class MenuHandler:
         self.main.levelSelection.toggle()
         self.deleteLevelMenu.do = True
         self.deleteLevelMenu.up = True
+    
+    def showRenameDialog(self):
+        self.rename.level = self.main.levelPreview.level
+        if self.rename.level == None:
+            self.main.warningHandler.createWarning("Select the level you want to rename !", 3)
+            return
+        self.show(self.rename)
+        self.main.levelPreview.pressLevel(None)
+        self.main.levelSelection.toggle()
 
     def showKeyBindings(self):
         self.main.keyBindingsMenu.create()
@@ -156,9 +185,18 @@ class MenuHandler:
         else:
             self.show(self.mainMenu)
 
+    def saveGoBack(self, save):
+        if save:
+            self.main.editor.actions.save()
+        self.main.editor.changed = False
+        self.goBack()
+
     def goBack(self):
         self.main.levelSelection.levelGuiHandler.canChange = True
         if self.main.editing:
+            if self.main.editor.changed:
+                self.show(self.ask)
+                return
             self.goToEdit = True
         if self.main.playing:
             self.main.player.alphaMove = True

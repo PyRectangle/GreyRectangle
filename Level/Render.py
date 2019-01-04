@@ -61,15 +61,21 @@ class Render:
         angle = attribute * 90
         return pygame.transform.rotate(texture, angle)
     
-    def mix(self, texture, color, factor, lineWidth):
+    def mix(self, texture, color, factor, lineWidth, returnSurface = False):
         if bool(factor):
-            width = texture.get_width()
-            height = texture.get_height()
+            if texture == None:
+                width, height = 144, 144
+            else:
+                width = texture.get_width()
+                height = texture.get_height()
             surface = pygame.Surface((width, height))
             surface.fill((0, 0, 0))
             surface.set_colorkey((0, 0, 0))
             pygame.draw.polygon(surface, color, [[0, 0], [width, 0], [width, height], [0, height]], lineWidth)
-            texture.blit(surface, (0, 0))
+            if returnSurface:
+                return surface
+            else:
+                texture.blit(surface, (0, 0))
         return texture
 
     def block(self, block, x, y, bigger = False, useNormalTexture = False):
@@ -77,11 +83,15 @@ class Render:
             texture = self.main.blocks.blocks[block[0]].texture
         else:
             texture = self.main.blocks.blocks[block[0]].resizedTexture
-        if block[1] != [] and texture != None:
-            texture = self.rotate(texture, int(block[1][0]))
-            if self.main.editing:
-                texture = self.mix(texture, (255, 0, 0), int(block[1][2]), 20)
-                texture = self.mix(texture, (255, 255, 255), 1 - int(block[1][1]), 10)
+        if block[1] != []:
+            if texture != None:
+                texture = self.rotate(texture, int(block[1][0]))
+            if self.main.editing and self.main.editor.active:
+                texture = self.mix(texture, (255, 0, 0), int(block[1][2]), 20, texture == None)
+                texture = self.mix(texture, (255, 255, 255), 1 - int(block[1][1]), 10, texture == None)
+        elif self.main.editing and self.main.editor.active:
+            texture = self.mix(self.mix(texture, (255, 0, 0), self.main.blocks.blocks[block[0]].death, 20, texture == None), (255, 255, 255),
+                               not self.main.blocks.blocks[block[0]].solid, 10, texture == None)
         if texture != None:
             if not bigger:
                 self.window.surface.blit(texture, (x, y))
@@ -126,6 +136,11 @@ class Render:
                         coords = self.window.getScreenCoords(vertex[0], vertex[1])
                         vertices.append([coords[0], coords[1]])
                     pygame.draw.polygon(surface, (255, 255, 255), vertices)
+        if self.main.editing and self.main.editor.playerCoords != []:
+            screenCoords = []
+            for coord in self.main.editor.playerCoords:
+                screenCoords.append(list(self.window.getScreenCoords(*coord)))
+            pygame.draw.polygon(surface, (255, 255, 255), screenCoords)
         if self.window.screenSurfaces == []:
             self.window.screenSurfaces.append(surface)
         else:

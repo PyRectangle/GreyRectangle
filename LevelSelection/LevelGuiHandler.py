@@ -32,6 +32,10 @@ class LevelGuiHandler:
                 guiId += 1
             except IndexError:
                 pass
+    
+    def updateText(self):
+        for gui in self.levelGuis:
+            gui.updateText()
         
     def deselect(self):
         self.selected = None

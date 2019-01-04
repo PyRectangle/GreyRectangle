@@ -1,11 +1,11 @@
 {
-    "SpawnX": 10,
-    "SpawnY": 1,
-    "Lifes": 10,
-    "JumpTime": 0.2,
-    "JumpHeight": 1.5,
-    "WalkSpeed": 1,
-    "FallSpeed": 1,
+    "Description": "Now with deaths",
+    "FallSpeed": 1.0,
     "FallSpeedMultiplier": 1.003,
-    "Description": "The second level"
+    "JumpHeight": 1.2,
+    "JumpTime": 0.2,
+    "Lifes": 10,
+    "SpawnX": 5,
+    "SpawnY": 5.802083333333333,
+    "WalkSpeed": 0.8
 }

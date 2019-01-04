@@ -1,11 +1,11 @@
 {
-    "SpawnX": 8,
-    "SpawnY": 7,
-    "Lifes": 10,
-    "JumpTime": 0.2,
-    "JumpHeight": 1.5,
-    "WalkSpeed": 1,
-    "FallSpeed": 1,
+    "Description": "Just some jumps",
+    "FallSpeed": 1.0,
     "FallSpeedMultiplier": 1.003,
-    "Description": "The first level"
+    "JumpHeight": 1.6,
+    "JumpTime": 0.3,
+    "Lifes": 1,
+    "SpawnX": 0,
+    "SpawnY": 4.802083333333333,
+    "WalkSpeed": 0.9
 }

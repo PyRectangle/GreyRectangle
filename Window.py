@@ -42,13 +42,6 @@ class Window(Frame.Window):
         self.main.config.config["DebugScreenActive"] = self.main.debugScreenActive
         self.main.config.config["FPSLimit"] = self.main.window.fpsLimit
         self.main.config.save()
-        if sys.platform == "linux":
-            path = os.path.join(os.path.expanduser("~"), "output")
-            count = -1
-            while os.path.exists(path):
-                count += 1
-                path = os.path.join(os.path.expanduser("~"), "output" + str(count))
-            os.system("rm -rf __pycache__ */__pycache__ */*/__pycache__ */*/*/__pycache__ > " + path)
-            os.system("rm -f *.pyc */*.pyc */*/*.pyc */*/*/*.pyc > " + path)
-            os.system("rm -f " + path)
+        if self.main.editor.actions != None:
+            self.main.editor.actions.clean()
         sys.exit()

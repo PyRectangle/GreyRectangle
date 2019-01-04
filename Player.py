@@ -1,4 +1,6 @@
+from Frame.Render import Render
 from Constants import *
+from Lifes import Lifes
 import pygame
 import math
 
@@ -9,6 +11,8 @@ class Player:
         self.lastSpeed = 0
         self.x = 0
         self.y = 0
+        self.active = False
+        self.activeCount = 0
         self.quitMenu = False
         self.fallSpeed = 0
         self.lastFallSpeed = 0
@@ -20,6 +24,10 @@ class Player:
         self.alpha = 0
         self.alphaUp = False
         self.alphaMove = False
+        self.lifes = 1
+        self.lifesObj = Lifes()
+        self.go = False
+        self.renderObj = Render(self.main.window)
         self.onGround = False
     
     def getBlockAt(self, x, y, load = False):
@@ -144,35 +152,42 @@ class Player:
         return end
         
     def update(self, go = True):
+        self.activeCount += self.main.window.dt / 1000
+        if self.activeCount >= 2:
+            self.active = True
+        self.go = go
         if go and not self.alphaMove:
             self.getPixelCoords()
         if not self.quitMenu:
-            self.onGround = False
             if self.first and self.main.camera.level != None:
                 self.fallSpeed = self.main.camera.level.data.fallSpeed
                 self.jumpTime = self.main.camera.level.data.jumpTime
                 self.jumpHeight = self.main.camera.level.data.jumpHeight
+                self.lifes = self.main.camera.level.data.lifes
+                self.lifesObj.update(self.lifes)
                 self.first = False
-            if go and not self.alphaMove:
-                self.getPixelCoords()
-                speed = self.main.window.dt * PLAYER_LOOP_SPEED * self.main.camera.level.data.walkSpeed + self.lastSpeed
-                self.lastSpeed = speed - int(speed)
-                speed = int(speed)
-                for i in range(speed):
-                    if self.main.window.keys[self.main.config.config["Controls"]["goRight"]]:
-                        if not self.collide("x+"):
-                            self.x += PLAYER_SPEED
-                    if self.main.window.keys[self.main.config.config["Controls"]["goLeft"]]:
-                        if not self.collide("x-"):
-                            self.x -= PLAYER_SPEED
-                    if self.main.window.keys[self.main.config.config["Controls"]["goUp"]] or self.main.window.keys[self.main.config.config["Controls"]["Jump"]]:
-                        if self.onGround:
-                            self.jump()
-                    if not self.jumping:
-                        self.fall()
-                self.getPixelCoords()
-            if self.jumping:
-                self.jumpUpdate()
+            if self.active:
+                self.onGround = False
+                if go and not self.alphaMove:
+                    self.getPixelCoords()
+                    speed = self.main.window.dt * PLAYER_LOOP_SPEED * self.main.camera.level.data.walkSpeed + self.lastSpeed
+                    self.lastSpeed = speed - int(speed)
+                    speed = int(speed)
+                    for i in range(speed):
+                        if self.main.window.keys[self.main.config.config["Controls"]["goRight"]]:
+                            if not self.collide("x+"):
+                                self.x += PLAYER_SPEED
+                        if self.main.window.keys[self.main.config.config["Controls"]["goLeft"]]:
+                            if not self.collide("x-"):
+                                self.x -= PLAYER_SPEED
+                        if self.main.window.keys[self.main.config.config["Controls"]["goUp"]] or self.main.window.keys[self.main.config.config["Controls"]["Jump"]]:
+                            if self.onGround:
+                                self.jump()
+                        if not self.jumping:
+                            self.fall()
+                    self.getPixelCoords()
+                if self.jumping:
+                    self.jumpUpdate()
             if self.alphaMove:
                 if self.alphaUp:
                     self.alpha += self.main.window.dt / 10
@@ -185,14 +200,15 @@ class Player:
                     if self.alpha < 0:
                         self.alpha = 0
                         self.alphaMove = False
-            if go:
+            if go and self.active:
                 for blockData in self.getTouch():
                     if blockData != None:
                         block = self.main.blocks.blocks[blockData[0]]
-                        if block.death:
+                        if block.death or (blockData[1] != [] and bool(int(blockData[1][2]))):
                             self.die()
-                        if blockData[1] != [] and bool(int(blockData[1][2])):
-                            self.die()
+                            break
+                        if blockData[0] == 4: # finished level
+                            self.main.menuHandler.goBack()
             if self.main.window.keys[self.main.config.config["Controls"]["Escape"]] and go:
                 self.quitMenu = True
                 self.main.menuHandler.show(self.main.menuHandler.playQuit)
@@ -210,6 +226,10 @@ class Player:
         
     def die(self):
         self.main.camera.setCoords(self.main.camera.level)
+        self.lifes -= 1
+        self.lifesObj.update(self.lifes)
+        if self.lifes <= 0: # game over
+            self.main.menuHandler.goBack()
     
     def render(self):
         if self.alpha == 255:
@@ -220,3 +240,5 @@ class Player:
                 surface.fill((150, 150, 150))
                 surface.set_alpha(self.alpha)
                 self.main.window.surface.blit(surface, self.coords[0])
+        if self.main.playing or not self.go:
+            self.lifesObj.render(self.renderObj, self.alpha)

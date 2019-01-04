@@ -76,8 +76,8 @@ class Main:
                 self.camera.render()
                 self.player.render()
             if self.editing and not self.levelPreview.shouldRender:
-                self.camera.update()
                 self.editor.update()
+                self.camera.update()
                 self.camera.render()
                 self.editor.render()
             updatedPreview = False

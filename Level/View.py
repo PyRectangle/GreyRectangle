@@ -47,9 +47,13 @@ class View:
                 if self.main.menuHandler.editor:
                     self.main.editing = True
                     self.main.editor.actions = Actions(self.level, self.main)
+                    self.main.editor.activeCount = 0
+                    self.main.editor.active = False
                 else:
                     self.main.playing = True
                     self.main.player.first = True
+                    self.main.player.active = False
+                    self.main.player.activeCount = 0
                 self.main.camera.setProps(self.level)
             else:
                 self.closeLevelSelection()

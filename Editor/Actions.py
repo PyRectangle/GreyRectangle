@@ -86,7 +86,7 @@ class Actions:
             self.level.data.regionsGrid.append(line)
         for file in files:
             coords = self.level.data.getCoords(file)
-            region = Region(self.level, self.level.data.number, *coords, True, os.path.join(LEVEL_REGION_EDITOR_TMP, str(coords[0]) + "-" + str(coords[1]) + ".rgn"))
+            region = Region(self.level, self.level.data.number, coords[0], coords[1], True, os.path.join(LEVEL_REGION_EDITOR_TMP, str(coords[0]) + "-" + str(coords[1]) + ".rgn"))
             self.level.data.regions.append(region)
             self.level.data.regionsGrid[coords[1] - self.level.data.smallest[1]][coords[0] - self.level.data.smallest[0]] = region
         self.level.data.loadJsonData()
@@ -123,6 +123,7 @@ class Actions:
         shutil.rmtree(os.path.join(self.level.folder, "region" + str(self.level.data.number)))
         shutil.copytree(LEVEL_REGION_EDITOR_TMP, os.path.join(self.level.folder, "region" + str(self.level.data.number)))
         self.level.data.save()
+        self.main.editor.changed = False
 
     def clean(self):
         if os.path.exists(LEVEL_REGION_EDITOR_TMP):

@@ -6,6 +6,7 @@ import os
 
 class Level:
     def __init__(self, folder, main):
+        self.main = main
         self.name = folder
         self.folder = LEVEL_PATH + "/" + folder
         self.dataFiles = []
@@ -16,6 +17,13 @@ class Level:
         self.render = Render(self, main)
         self.data = Data(self)
     
+    def rename(self, name):
+        self.name = name
+        folder = LEVEL_PATH + "/" + name
+        os.rename(self.folder, folder)
+        self.folder = folder
+        self.main.levelSelection.levelGuiHandler.updateText()
+
     def openSection(self, number):
         self.close()
         self.data = Data(self, number)

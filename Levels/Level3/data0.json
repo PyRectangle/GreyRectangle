@@ -1,11 +1,11 @@
 {
-    "SpawnX": 0,
-    "SpawnY": 1,
-    "Lifes": 10,
-    "JumpTime": 0.2,
-    "JumpHeight": 1.5,
-    "WalkSpeed": 1,
-    "FallSpeed": 1,
+    "Description": "It is invisible",
+    "FallSpeed": 1.0,
     "FallSpeedMultiplier": 1.003,
-    "Description": "The third level"
+    "JumpHeight": 1.5,
+    "JumpTime": 0.2,
+    "Lifes": 10,
+    "SpawnX": 8,
+    "SpawnY": 4.802083333333333,
+    "WalkSpeed": 1.0
 }

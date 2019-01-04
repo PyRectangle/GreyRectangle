@@ -25,8 +25,8 @@ class BlockSelection:
             self.block += scroll
             if self.block < 0:
                 self.block = 0
-            if self.block > len(self.main.blocks.blocks) - 2:
-                self.block = len(self.main.blocks.blocks) - 2
+            if self.block > len(self.main.blocks.blocks) - 1:
+                self.block = len(self.main.blocks.blocks) - 1
         self.on = True
     
     def checkBlockBoundary(self, value):
@@ -64,9 +64,9 @@ class BlockSelection:
             graphic.render()
         if self.graphics[1].isChanging or self.graphics[1].isOpen:
             for block in range(5):
-                blockID = self.block + block - 1
+                blockID = self.block + block - 2
                 if not self.checkBlockBoundary(blockID):
                     bigger = False
-                    if blockID == self.block + 1:
+                    if blockID == self.block:
                         bigger = True
                     self.main.camera.level.render.block([blockID, self.data], 648 + (block - 2) * 204, self.graphics[0].point[1] + 916, bigger, True)

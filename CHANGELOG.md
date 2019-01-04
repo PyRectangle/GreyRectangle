@@ -39,6 +39,7 @@
 - Added the video setting's gui elements
 - Added a reset window size button
 - Added a level quit menu
+- Added Level Options
 ## Resources
 - Added json files that are defining the blocks
 - Added freesansbold.ttf
@@ -51,6 +52,7 @@
 - Added falling with fall multiplier
 - Added menu to access settings while playing and for quitting
 - Added go in / out animation for the player
+- Added lifes
 ## Editor
 - Added a grid
 - Added go in / out animation for the grid
@@ -60,6 +62,10 @@
 - Added block selection
 - Added block attributes
 - Added spawn setting
+- Added marking of blocks that are solid or cause the player to die
+- Added jump walk fall and description value changes in level options
+- Added save asking when quitting
+- Added level renaming
 ## Main
 - Added block loading
 - Added a configuration file

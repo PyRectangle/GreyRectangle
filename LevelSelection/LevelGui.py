@@ -65,6 +65,10 @@ class LevelGui:
         else:
             self.notRender = True
     
+    def updateText(self):
+        self.graphics[1].text = (FONT, 140, self.level.name, True, (0, 0, 0), None)
+        self.graphics[2].text = (FONT, 40, self.level.data.description, True, (0, 0, 0), None)
+    
     def update(self):
         mousePos = self.window.mousePos
         hitCoords = [[self.x + 900, self.y + 360], [self.x + 1440, self.y + 660]]
