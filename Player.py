@@ -226,6 +226,7 @@ class Player:
         
     def die(self):
         self.main.camera.setCoords(self.main.camera.level)
+        self.juming = False
         self.lifes -= 1
         self.lifesObj.update(self.lifes)
         if self.lifes <= 0: # game over

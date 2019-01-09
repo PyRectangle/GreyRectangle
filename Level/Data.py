@@ -53,6 +53,7 @@ class Data:
         self.loadJsonData()
     
     def loadJsonData(self):
+#        self.music = self.jsonData["Music"]
         self.spawnX = self.jsonData["SpawnX"] - self.smallest[0] * 16
         self.spawnY = self.jsonData["SpawnY"] - self.smallest[1] * 16
         self.lifes = self.jsonData["Lifes"]
