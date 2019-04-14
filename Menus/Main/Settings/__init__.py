@@ -10,7 +10,7 @@ class Settings(Menu):
         self.menuHandler = menuHandler
         self.addGui(Button, (menuHandler.outOfSettings, (), 60, 940, 300, 100, "Back", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30,
                              0.1, True, [0, -1], None, SOUNDS, menuHandler.window))
-        self.addGui(Button, (menuHandler.showKeyBindings, (), 60, 80, 800, 120, "KeyBindings", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True,
+        self.addGui(Button, (menuHandler.showKeyBindings, (), 60, 80, 600, 120, "Controls", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True,
                              30, 30, 0.1, True, [0, 1], None, SOUNDS, menuHandler.window))
         self.addGui(Button, (menuHandler.show, (4), 60, 220, 880, 120, "Video Settings", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30,
                              0.1, True, [0, 1], None, SOUNDS, menuHandler.window))
