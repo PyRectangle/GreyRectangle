@@ -29,6 +29,7 @@
     },
     "DebugScreenActive": false,
     "FPSLimit": 0,
+    "Fullscreen": false,
     "UseBusyLoop": true,
     "Volume": 100
 }

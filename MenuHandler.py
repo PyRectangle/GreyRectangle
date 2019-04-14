@@ -5,6 +5,8 @@ from Menus.Main.Settings.VideoSettings import VideoSettings
 from Menus.Main.Settings.KeyBindings import KeyBindings
 from Menus.Main.LevelSelectionEdit.Rename import Rename
 from Menus.Main.LevelSelection import LevelSelection
+from Menus.Main.Selection.Region import RegionMenu
+from Menus.Main.Selection.Block import BlockMenu
 from Menus.Main.LevelOptions import LevelOptions
 from Menus.Main.ActionMenu import ActionMenu
 from Menus.Main.Settings import Settings
@@ -53,8 +55,10 @@ class MenuHandler:
         self.levelOptions = LevelOptions(self)
         self.ask = Ask(self)
         self.rename = Rename(self)
+        self.blockMenu = BlockMenu(self)
+        self.regionMenu = RegionMenu(self)
         self.menus = [self.mainMenu, self.levelSelection, self.settings, self.keyBindings, self.videoSettings, self.playQuit, self.editQuit, self.levelSelectionEdit,
-                      self.createLevelMenu, self.deleteLevelMenu, self.actionMenu, self.levelOptions, self.ask, self.rename]
+                      self.createLevelMenu, self.deleteLevelMenu, self.actionMenu, self.levelOptions, self.ask, self.rename, self.blockMenu, self.regionMenu]
     
     def showLevelOptions(self):
         self.levelOptions.do = True

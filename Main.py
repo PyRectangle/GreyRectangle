@@ -27,9 +27,6 @@ class Main:
         pygame.draw.polygon(self.icon, (150, 150, 150), [[8, 0], [8, 32], [24, 32], [24, 0]])
         self.window = Window(self, "GreyRectangle", WINDOW_SIZE, SURFACE_SIZE, flags = Frame.RESIZABLE | Frame.HWSURFACE | Frame.HWPALETTE | Frame.HWACCEL,
                              icon = self.icon)
-        self.menuHandler = MenuHandler(self)
-        self.menuHandler.create()
-        self.menuHandler.show(self.menuHandler.mainMenu)
         self.warningHandler = WarningHandler(self.window)
         self.levelHandler = LevelHandler(self)
         self.levelSelection = LevelSelection(self)
@@ -38,6 +35,9 @@ class Main:
         self.player = Player(self)
         self.editor = Editor(self)
         self.camera = Camera(self)
+        self.menuHandler = MenuHandler(self)
+        self.menuHandler.create()
+        self.menuHandler.show(self.menuHandler.mainMenu)
         self.debugScreen = DebugScreen(self.window)
         self.window.guiChanger = self.config.config["Controls"]["GuiChanger"]
         self.window.guiPresser = self.config.config["Controls"]["GuiPresser"]
@@ -56,6 +56,8 @@ class Main:
             if self.window.key == self.config.config["Controls"]["FullScreen"]:
                 self.window.toggleFullscreen()
             if self.window.key == self.config.config["Controls"]["ScreenShot"]:
+                if not os.path.exists("Screenshots"):
+                    os.makedirs("Screenshots")
                 currentTime = time.localtime()
                 count = ""
                 name = "Screenshots/screenshot-" + str(currentTime.tm_hour) + ":" + str(currentTime.tm_min) + ":" + str(currentTime.tm_sec)

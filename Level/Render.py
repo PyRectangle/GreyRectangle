@@ -7,6 +7,8 @@ class Render:
         self.level = level
         self.window = main.window
         self.main = main
+        self.red = pygame.Surface((1, 1))
+        self.red.fill((255, 0, 0))
         self.lastSize = 144
     
     def blocks(self, x, y, size = BLOCK_SIZE, distance = None):
@@ -39,6 +41,7 @@ class Render:
                 regionX = indexX / 16
                 regionY = indexY / 16
                 try:
+                    inLevel = True
                     if not regionX < 0 and not regionY < 0 and not indexX < 0 and not indexY < 0:
                         regionObj = self.level.data.regionsGrid[int(regionY)][int(regionX)]
                         if regionObj != None and regionObj.loaded:
@@ -46,7 +49,7 @@ class Render:
                                 regionIndexX = int(indexX - int(regionX) * 16)
                                 regionIndexY = int(indexY - int(regionY) * 16)
                                 block = regionObj.region[regionIndexY][regionIndexX]
-                                self.block(block, blitPosX, blitPosY)
+                                self.block(block, blitPosX, blitPosY, blockCoords = [indexX, indexY])
                             except IndexError:
                                 pass
                         elif regionObj != None and not regionObj.loading:
@@ -54,17 +57,25 @@ class Render:
                                 regionObj.start()
                             except RuntimeError:
                                 pass
+                        if regionObj == None:
+                            inLevel = False
+                    else:
+                        inLevel = False
                 except IndexError:
-                    pass
+                    inLevel = False
+                if not inLevel:
+                    self.window.surface.blit(pygame.transform.scale(self.red, (size, size)), (blitPosX, blitPosY))
 
     def rotate(self, texture, attribute):
-        angle = attribute * 90
-        return pygame.transform.rotate(texture, angle)
+        if texture != None:
+            angle = attribute * 90
+            return pygame.transform.rotate(texture, angle)
+        return None
     
     def mix(self, texture, color, factor, lineWidth, returnSurface = False):
         if bool(factor):
             if texture == None:
-                width, height = 144, 144
+                width, height = self.main.blocks.size
             else:
                 width = texture.get_width()
                 height = texture.get_height()
@@ -77,21 +88,57 @@ class Render:
             else:
                 texture.blit(surface, (0, 0))
         return texture
+    
+    def colorTexture(self, texture, color = (255, 0, 0), alpha = 100):
+        surface = pygame.Surface((texture.get_width(), texture.get_height()))
+        surface.convert()
+        surface.fill(color)
+        surface.set_alpha(alpha)
+        rTexture = texture.copy()
+        rTexture.blit(surface, (0, 0))
+        return rTexture
 
-    def block(self, block, x, y, bigger = False, useNormalTexture = False):
+    def block(self, block, x, y, bigger = False, useNormalTexture = False, blockCoords = [-1, -1]):
         if useNormalTexture:
             texture = self.main.blocks.blocks[block[0]].texture
         else:
             texture = self.main.blocks.blocks[block[0]].resizedTexture
+        if self.main.playing and block[1] != []:
+            distanceToBlock = [x + BLOCK_SIZE / 2 - self.main.player.center[0], y + BLOCK_SIZE / 2 - self.main.player.center[1]]
+            for i in range(2):
+                if distanceToBlock[i] < 0:
+                    distanceToBlock[i] = -distanceToBlock[i]
+            distanceColor = (distanceToBlock[0] + distanceToBlock[1]) / 4
+            if distanceColor > 255:
+                distanceColor = 255
+            distanceColor = 255 - distanceColor
+            if texture == None:
+                playTexture = pygame.Surface((BLOCK_SIZE, BLOCK_SIZE))
+                playTexture.fill((255, 255, 255))
+            else:
+                playTexture = texture
+            if block[1][2] != self.main.blocks.blocks[block[0]].death and (not block[1][1] or not self.main.blocks.blocks[block[0]].solid):
+                texture = self.colorTexture(playTexture, (255, 0, 0), distanceColor)
+            elif (block[1][1] != self.main.blocks.blocks[block[0]].solid and not block[1][1]) or (block[1][2] == False and block[1][2] != self.main.blocks.blocks[block[0]].death and (not block[1][1] or not self.main.blocks.blocks[block[0]].solid)):
+                texture = self.colorTexture(playTexture, (255, 255, 255), distanceColor)
         if block[1] != []:
             if texture != None:
                 texture = self.rotate(texture, int(block[1][0]))
             if self.main.editing and self.main.editor.active:
                 texture = self.mix(texture, (255, 0, 0), int(block[1][2]), 20, texture == None)
                 texture = self.mix(texture, (255, 255, 255), 1 - int(block[1][1]), 10, texture == None)
-        elif self.main.editing and self.main.editor.active:
+        if self.main.editing and self.main.editor.active:
+            if texture == None:
+                if useNormalTexture:
+                    texture = pygame.Surface((144, 144))
+                else:
+                    texture = pygame.Surface(self.main.blocks.size)
+                texture.fill((255, 255, 255))
             texture = self.mix(self.mix(texture, (255, 0, 0), self.main.blocks.blocks[block[0]].death, 20, texture == None), (255, 255, 255),
                                not self.main.blocks.blocks[block[0]].solid, 10, texture == None)
+            if self.main.editor.selection != None and self.main.editor.selection[0][0] <= blockCoords[0] and self.main.editor.selection[0][1] <= blockCoords[1] \
+               and self.main.editor.selection[1][0] >= blockCoords[0] and self.main.editor.selection[1][1] >= blockCoords[1]:
+                texture = self.colorTexture(texture, (100, 100, 255))
         if texture != None:
             if not bigger:
                 self.window.surface.blit(texture, (x, y))

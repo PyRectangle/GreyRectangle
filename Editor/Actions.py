@@ -22,7 +22,10 @@ class Actions:
         return region
         
     def deleteRegion(self, regionX, regionY):
-        os.remove(LEVEL_REGION_EDITOR_TMP + "/" + str(regionX) + "-" + str(regionY) + ".rgn")
+        try:
+            os.remove(LEVEL_REGION_EDITOR_TMP + "/" + str(regionX) + "-" + str(regionY) + ".rgn")
+        except FileNotFoundError:
+            pass
         self.updateRegions()
 
     def getRegion(self, x, y, create = True, load = True):
@@ -92,6 +95,11 @@ class Actions:
         self.level.data.loadJsonData()
         dx = (smallest[0] - self.level.data.smallest[0]) * 16
         dy = (smallest[1] - self.level.data.smallest[1]) * 16
+        if self.main.editor.selection != None:
+            self.main.editor.selection[0][0] += dx
+            self.main.editor.selection[0][1] += dy
+            self.main.editor.selection[1][0] += dx
+            self.main.editor.selection[1][1] += dy
         self.main.editor.x += dx
         self.main.editor.y += dy
         self.main.camera.x += dx
@@ -102,20 +110,22 @@ class Actions:
         x, y = self.getRegionIndex(x, y)
         return region.region[y][x]
 
-    def setblock(self, x, y, block, blockData):
-        region = self.getRegion(x, y)
-        x, y = self.getRegionIndex(x, y)
-        region.region[y][x] = [block, blockData]
+    def setblock(self, x, y, block, blockData, create = True):
+        region = self.getRegion(x, y, create)
+        if region != None:
+            x, y = self.getRegionIndex(x, y)
+            region.region[y][x] = [block, blockData]
+            self.main.editor.changed = True
 
     def fill(self, x1, y1, x2, y2, block, blockData):
-        for y in range(y2 - y1):
-            for x in range(x2 - x1):
-                self.setblock(x1 + x, y1 + y, block, blockData)
+        for y in range(y2 - y1 + 1):
+            for x in range(x2 - x1 + 1):
+                self.setblock(x1 + x, y1 + y, block, blockData, False)
 
-    def clone(self, x1, y1, x2, y2, x3, y3, block, blockData):
-        for y in range(y2 - y1):
-            for x in range(x2 - x1):
-                self.setblock(x3 + x, y3 + y, *self.getblock(x1 + x, y1 + y))
+    def clone(self, x1, y1, x2, y2, x3, y3):
+        for y in range(y2 - y1 + 1):
+            for x in range(x2 - x1 + 1):
+                self.setblock(x3 + x, y3 + y, *self.getblock(x1 + x, y1 + y), False)
 
     def save(self):
         for region in self.level.data.regions:

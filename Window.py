@@ -41,7 +41,8 @@ class Window(Frame.Window):
         pygame.quit()
         self.main.config.config["DebugScreenActive"] = self.main.debugScreenActive
         self.main.config.config["FPSLimit"] = self.main.window.fpsLimit
+        self.main.config.config["Fullscreen"] = self.fullscreen
         self.main.config.save()
         if self.main.editor.actions != None:
             self.main.editor.actions.clean()
-        sys.exit()
+        sys.exit(0)

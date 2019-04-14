@@ -40,6 +40,7 @@
 - Added a reset window size button
 - Added a level quit menu
 - Added Level Options
+- Added Fullscreen option
 ## Resources
 - Added json files that are defining the blocks
 - Added freesansbold.ttf
@@ -53,6 +54,7 @@
 - Added menu to access settings while playing and for quitting
 - Added go in / out animation for the player
 - Added lifes
+- Can now see important changed block attributes
 ## Editor
 - Added a grid
 - Added go in / out animation for the grid
@@ -66,6 +68,10 @@
 - Added jump walk fall and description value changes in level options
 - Added save asking when quitting
 - Added level renaming
+- The level border is now shown
+- Added selecting and region selecting
+- Added filling, cloning and removingf of selection
+- Added movement using mouse
 ## Main
 - Added block loading
 - Added a configuration file

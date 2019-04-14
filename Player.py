@@ -29,6 +29,7 @@ class Player:
         self.go = False
         self.renderObj = Render(self.main.window)
         self.onGround = False
+        self.center = [0, 0]
     
     def getBlockAt(self, x, y, load = False):
         if x < 0 or y < 0:
@@ -223,10 +224,16 @@ class Player:
             self.yPx -= 1
         self.coords = [[self.xPx - PLAYER_SIZE[0], self.yPx - PLAYER_SIZE[1]], [self.xPx + PLAYER_SIZE[0], self.yPx - PLAYER_SIZE[1]],
                        [self.xPx + PLAYER_SIZE[0], self.yPx + PLAYER_SIZE[1]], [self.xPx - PLAYER_SIZE[0], self.yPx + PLAYER_SIZE[1]]]
+        self.center = [0, 0]
+        for coord in self.coords:
+            for i in range(2):
+                self.center[i] += coord[i]
+        for i in range(2):
+            self.center[i] /= 4
         
     def die(self):
         self.main.camera.setCoords(self.main.camera.level)
-        self.juming = False
+        self.jumping = False
         self.lifes -= 1
         self.lifesObj.update(self.lifes)
         if self.lifes <= 0: # game over

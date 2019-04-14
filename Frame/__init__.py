@@ -84,7 +84,7 @@ class Window:
             self.size = list(size)
             output("Window: Setting mode...", "debug")
             if self.fullscreen:
-                self.screen = pygame.display.set_mode(self.size, self.flags | pygame.FULLSCREEN)
+                self.screen = pygame.display.set_mode(self.size, self.flags | pygame.FULLSCREEN | pygame.NOFRAME)
             else:
                 self.screen = pygame.display.set_mode(self.size, self.flags)
             self.__surfaceSize = self.size
