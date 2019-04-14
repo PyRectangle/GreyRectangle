@@ -21,12 +21,13 @@ class Actions:
         self.updateRegions()
         return region
         
-    def deleteRegion(self, regionX, regionY):
+    def deleteRegion(self, regionX, regionY, update = True):
         try:
             os.remove(LEVEL_REGION_EDITOR_TMP + "/" + str(regionX) + "-" + str(regionY) + ".rgn")
         except FileNotFoundError:
             pass
-        self.updateRegions()
+        if update:
+            self.updateRegions()
 
     def getRegion(self, x, y, create = True, load = True):
         regionX, regionY = self.getRegionCoords(x, y)

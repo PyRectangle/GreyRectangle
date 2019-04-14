@@ -136,6 +136,7 @@ class Editor:
                     if list(self.main.window.mousePressed)[0] or list(self.main.window.mousePressed)[2]:
                         self.actions.clone(*self.selection[0], *self.selection[1], *self.mouseBlockPos)
                         self.cloning = False
+                        self.changed = True
             if self.main.window.keys[self.main.config.config["Controls"]["Escape"]]:
                 self.quit = True
                 self.main.menuHandler.show(6)
@@ -162,6 +163,7 @@ class Editor:
     
     def fill(self):
         self.actions.fill(*self.selection[0], *self.selection[1], self.selectedBlock, self.blockSelection.data.copy())
+        self.changed = True
 
     def clone(self):
         self.cloning = True
@@ -178,6 +180,7 @@ class Editor:
             for x in range(selection[1][0] - selection[0][0] + 1):
                 self.actions.deleteRegion(selection[0][0] + x + self.actions.level.data.smallest[0], selection[0][1] + y + self.actions.level.data.smallest[1])
         self.deselect()
+        self.changed = True
 
     def render(self):
         active = self.active
