@@ -55,6 +55,7 @@
 - Added go in / out animation for the player
 - Added lifes
 - Can now see important changed block attributes
+- Added chat
 ## Editor
 - Added a grid
 - Added go in / out animation for the grid
@@ -80,3 +81,4 @@
 - Added a menu handling system
 - Added an exit animation
 - Added config saving when exiting
+- Added pygame_sdl2 support

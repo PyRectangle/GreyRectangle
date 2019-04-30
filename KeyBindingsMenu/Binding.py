@@ -1,8 +1,8 @@
 from LevelSelection.Graphic import Graphic
 from Frame.gui.Button import Button
+from pygameImporter import pygame
 from Frame.Render import Render
 from Constants import *
-import pygame
 
 
 class Binding:
@@ -15,7 +15,7 @@ class Binding:
         self.renderObj = Render(window)
         self.dictionary = dictionary
         self.graphics = [Graphic((100, 100, 100), [[0, y], [1440, y], [1440, y + 50], [0, y + 50]], [-1440, 0], speed, window, (FONT, 45, text, True, (0, 0, 0), None), 0, y),
-                         Graphic((100, 100, 100), [[0, y], [0, y], [0, y]], [-1440, 0], speed, window, (FONT, 50, pygame.key.name(key), True, (0, 0, 0), None), 800, y)]
+                         Graphic((100, 100, 100), [[0, y], [0, y], [0, y]], [-1440, 0], speed, window, (FONT, 50, self.getKeyName(key), True, (0, 0, 0), None), 800, y)]
         self.button = None
 
     def create(self):
@@ -31,6 +31,12 @@ class Binding:
                 graphic.toggle()
         self.button.delete()
     
+    def getKeyName(self, key):
+        keyText = pygame.key.name(key)
+        if type(keyText) == bytes:
+            keyText = keyText.decode()
+        return keyText
+    
     def change(self):
         self.key = 0
         pressed = False
@@ -42,7 +48,7 @@ class Binding:
                     self.key = event.key
                     pressed = True
             self.window.updateDisplay()
-        self.graphics[1].text = (FONT, 50, pygame.key.name(self.key), True, (0, 0, 0), None)
+        self.graphics[1].text = (FONT, 50, self.getKeyName(self.key), True, (0, 0, 0), None)
         self.dictionary["Controls"][self.name] = self.key
 
     def update(self):

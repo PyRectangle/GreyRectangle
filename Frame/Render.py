@@ -1,5 +1,5 @@
+from pygameImporter import pygame
 from Frame.baseFunctions import *
-import pygame
 
 
 class Render:
@@ -39,6 +39,10 @@ class Render:
             textSurfaceAlpha.fill(otherColor)
             textSurfaceAlpha.set_colorkey(otherColor)
             textSurfaceAlpha.blit(textSurface, (0, 0))
+            if alpha > 255:
+                alpha = 255
+            if alpha < 0:
+                alpha = 0
             textSurfaceAlpha.set_alpha(alpha)
             textSurface = textSurfaceAlpha
         if blit:

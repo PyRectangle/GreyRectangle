@@ -1,4 +1,4 @@
-import pygame
+from pygameImporter import pygame
 
 
 class Graphic:

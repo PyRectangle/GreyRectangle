@@ -1,6 +1,6 @@
+from pygameImporter import pygame
 from Constants import *
 from Block import Block
-import pygame
 import os
 
 

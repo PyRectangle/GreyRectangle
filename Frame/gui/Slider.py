@@ -1,6 +1,6 @@
 from Frame.baseFunctions import *
 from Frame.gui.Gui import Gui
-from pygame.locals import *
+from pygameImporter import *
 
 
 class Slider(Gui):

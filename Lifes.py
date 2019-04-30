@@ -1,5 +1,5 @@
+from pygameImporter import pygame
 from Constants import *
-import pygame
 import os
 
 

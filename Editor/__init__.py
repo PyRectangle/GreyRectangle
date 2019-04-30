@@ -1,7 +1,7 @@
 from Editor.BlockSelection import BlockSelection
+from pygameImporter import pygame
 from Frame.Render import Render
 from Constants import *
-import pygame
 
 
 class Editor:

@@ -9,16 +9,17 @@ from Menus.Main.Selection.Region import RegionMenu
 from Menus.Main.Selection.Block import BlockMenu
 from Menus.Main.LevelOptions import LevelOptions
 from Menus.Main.ActionMenu import ActionMenu
+from Menus.Main.ChatMenu import ChatMenu
 from Menus.Main.Settings import Settings
 from Menus.Main.PlayQuit import PlayQuit
 from Menus.Main.EditQuit import EditQuit
 from Frame.gui.Button import Button
+from pygameImporter import pygame
 from Frame.Render import Render
 from Menus.Main import MainMenu
 from Menus.Main.Ask import Ask
 from Constants import *
 from Menu import Menu
-import pygame
 import os
 
 
@@ -39,6 +40,7 @@ class MenuHandler:
         self.outOfPlay = False
         self.goToPlay = False
         self.goToEdit = False
+        self.chatMenu = ChatMenu(self)
 
     def create(self):
         self.mainMenu = MainMenu(self)
@@ -57,8 +59,10 @@ class MenuHandler:
         self.rename = Rename(self)
         self.blockMenu = BlockMenu(self)
         self.regionMenu = RegionMenu(self)
+        self.chatMenu = ChatMenu(self)
         self.menus = [self.mainMenu, self.levelSelection, self.settings, self.keyBindings, self.videoSettings, self.playQuit, self.editQuit, self.levelSelectionEdit,
-                      self.createLevelMenu, self.deleteLevelMenu, self.actionMenu, self.levelOptions, self.ask, self.rename, self.blockMenu, self.regionMenu]
+                      self.createLevelMenu, self.deleteLevelMenu, self.actionMenu, self.levelOptions, self.ask, self.rename, self.blockMenu, self.regionMenu,
+                      self.chatMenu]
     
     def showLevelOptions(self):
         self.levelOptions.do = True

@@ -6,6 +6,7 @@
         "GuiChanger": 9,
         "GuiPresser": 13,
         "Jump": 32,
+        "OpenChat": 116,
         "ScreenShot": 283,
         "Zoom": 304,
         "goDown": 274,
@@ -20,6 +21,7 @@
         "GuiChanger": "Change the selected gui element:",
         "GuiPresser": "Press the selected gui element:",
         "Jump": "Jump:",
+        "OpenChat": "Open the Chat:",
         "ScreenShot": "Make a screen shot:",
         "Zoom": "Zoom in editor:",
         "goDown": "Go down:",
@@ -30,6 +32,7 @@
     "DebugScreenActive": false,
     "FPSLimit": 0,
     "Fullscreen": false,
+    "SDL2": false,
     "UseBusyLoop": true,
     "Volume": 100
 }

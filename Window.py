@@ -1,6 +1,8 @@
+from pygameImporter import pygame
 from random import randint
-import pygame
+from Constants import *
 import Frame
+import json
 import sys
 import os
 
@@ -42,6 +44,14 @@ class Window(Frame.Window):
         self.main.config.config["DebugScreenActive"] = self.main.debugScreenActive
         self.main.config.config["FPSLimit"] = self.main.window.fpsLimit
         self.main.config.config["Fullscreen"] = self.fullscreen
+        toggledSDL = self.main.config.config["SDL2"] != json.load(open(CONFIG_FILE))["SDL2"]
+        if toggledSDL:
+            keyTranslate = self.main.menuHandler.videoSettings.keyTranslate
+            for key in self.main.config.config["Controls"]:
+                if self.main.config.config["SDL2"]:
+                    self.main.config.config["Controls"][key] = keyTranslate.translate1to2(self.main.config.config["Controls"][key])
+                else:
+                    self.main.config.config["Controls"][key] = keyTranslate.translate2to1(self.main.config.config["Controls"][key])
         self.main.config.save()
         if self.main.editor.actions != None:
             self.main.editor.actions.clean()

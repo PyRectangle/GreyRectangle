@@ -1,8 +1,8 @@
 from Frame.gui.Button import Button
+from pygameImporter import pygame
 from Frame.Render import Render
 from Constants import *
 from Menu import Menu
-import pygame
 
 
 class DeleteLevel(Menu):

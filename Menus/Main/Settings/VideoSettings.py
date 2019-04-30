@@ -1,3 +1,4 @@
+from KeyTranslate import KeyTranslate
 from Frame.gui.Button import Button
 from Frame.gui.Slider import Slider
 from Constants import *
@@ -7,6 +8,7 @@ from Menu import Menu
 class VideoSettings(Menu):
     def __init__(self, menuHandler):
         super().__init__()
+        self.keyTranslate = KeyTranslate()
         self.menuHandler = menuHandler
         if self.menuHandler.main.config.config["Fullscreen"]:
             self.menuHandler.window.toggleFullscreen()
@@ -18,11 +20,30 @@ class VideoSettings(Menu):
                              0.1, True, [1, 1], None, SOUNDS, menuHandler.window, 80))
         self.addGui(Button, (self.toggleFullscreen, (), 60, 400, 800, 120, "Fullscreen: on", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30,
                              0.1, True, [1, 1], None, SOUNDS, menuHandler.window, 80))
+        self.addGui(Button, (self.toggleSDL2, (), 60, 560, 800, 120, "Use SDL2: on", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30, 0.1,
+                             True, [1, 1], None, SOUNDS, menuHandler.window, 80))
     
     def update(self):
         super().update()
         if self.menuHandler.main.config.config["Fullscreen"] != self.menuHandler.window.fullscreen:
             self.toggleFullscreen(False)
+        if len(self.createdGuis) == len(self.guis):
+            self.toggleSDL2(False)
+
+    def toggleSDL2(self, toggle = True):
+        if toggle:
+            if self.keyTranslate.installed:
+                self.menuHandler.main.warningHandler.createWarning("This option requires a restart to take effect !", 1.5)
+                self.menuHandler.main.config.config["SDL2"] = not self.menuHandler.main.config.config["SDL2"]
+            else:
+                if not self.keyTranslate.installedSdl1:
+                    self.menuHandler.main.warningHandler.createWarning("This option requires pygame using SDL-1 to be installed !", 2)
+                else:
+                    self.menuHandler.main.warningHandler.createWarning("This option requires pygame_sdl2 to be installed !", 2)
+        state = "off"
+        if self.menuHandler.main.config.config["SDL2"]:
+            state = "on"
+        self.createdGuis[4].text = "Use SDL2: " + state
     
     def toggleFullscreen(self, toggle = True):
         if toggle:

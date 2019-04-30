@@ -1,5 +1,5 @@
+from pygameImporter import pygame
 from Frame.baseFunctions import *
-import pygame
 
 
 class ClickAnim:

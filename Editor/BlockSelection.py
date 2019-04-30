@@ -1,5 +1,5 @@
 from LevelSelection.Graphic import Graphic
-from pygame.locals import *
+from pygameImporter import *
 
 
 class BlockSelection:

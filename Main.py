@@ -4,6 +4,7 @@ from LevelSelection import LevelSelection
 from WarningHandler import WarningHandler
 from MenuHandler import MenuHandler
 from DebugScreen import DebugScreen
+from pygameImporter import *
 from Level.View import View
 from Player import Player
 from Editor import Editor
@@ -12,7 +13,6 @@ from Window import Window
 from Config import Config
 from Blocks import Blocks
 from Constants import *
-import pygame
 import Frame
 import time
 import os
@@ -25,17 +25,20 @@ class Main:
         self.icon = pygame.Surface((32, 32))
         self.icon.set_colorkey((0, 0, 0))
         pygame.draw.polygon(self.icon, (150, 150, 150), [[8, 0], [8, 32], [24, 32], [24, 0]])
-        self.window = Window(self, "GreyRectangle", WINDOW_SIZE, SURFACE_SIZE, flags = Frame.RESIZABLE | Frame.HWSURFACE | Frame.HWPALETTE | Frame.HWACCEL,
-                             icon = self.icon)
+        try:
+            self.window = Window(self, "GreyRectangle", WINDOW_SIZE, SURFACE_SIZE, flags = Frame.RESIZABLE,
+                                icon = self.icon)
+        except AttributeError:
+            self.window = Window(self, "GreyRectangle", WINDOW_SIZE, SURFACE_SIZE, flags = Frame.RESIZABLE, icon = self.icon)
         self.warningHandler = WarningHandler(self.window)
         self.levelHandler = LevelHandler(self)
         self.levelSelection = LevelSelection(self)
         self.keyBindingsMenu = KeyBindingsMenu(self)
         self.levelPreview = View(self)
         self.player = Player(self)
+        self.menuHandler = MenuHandler(self)
         self.editor = Editor(self)
         self.camera = Camera(self)
-        self.menuHandler = MenuHandler(self)
         self.menuHandler.create()
         self.menuHandler.show(self.menuHandler.mainMenu)
         self.debugScreen = DebugScreen(self.window)
@@ -49,6 +52,8 @@ class Main:
         self.blocks = Blocks()
         self.playing = False
         self.editing = False
+        if failedSDL2Import:
+            self.warningHandler.createWarning("Unable to import pygame_sdl2 !", 2)
         self.loop()
 
     def loop(self):

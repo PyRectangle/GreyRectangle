@@ -1,9 +1,9 @@
 from Frame.gui.GuiHandler import GuiHandler
+from Frame.KeyDict import KeyDict
 from Frame.baseFunctions import *
 from Frame.Render import Render
-from pygame.locals import *
+from pygameImporter import *
 import screeninfo
-import pygame
 
 
 class Window:
@@ -39,9 +39,7 @@ class Window:
         self.guiHandler = GuiHandler(self)
         self.useBusyLoop = True
         self.char = ""
-        self.keys = []
-        for i in range(323):
-            self.keys.append(0)
+        self.keys = KeyDict()
         self.clock = pygame.time.Clock()
         self.__getMouseStates()
         self.surfaceSize = surfaceSize
@@ -59,7 +57,7 @@ class Window:
         self.screenSurfaces = []
         if fullscreen:
             self.toggleFullscreen()
-    
+        
     def getTitle(self):
         output("Window: Getting window title...", "debug")
         return self.__title
@@ -82,7 +80,7 @@ class Window:
                 pygame.display.init()
                 os.environ['SDL_VIDEO_WINDOW_POS'] = str(int(self.RESOLUTION.width / 2 - size[0] / 2)) + ", " + str(int(self.RESOLUTION.height / 2 - self.size[1] / 2))
             self.size = list(size)
-            output("Window: Setting mode...", "debug")
+            output("Window: Setting mode to " + str(tuple(self.size)) + "...", "debug")
             if self.fullscreen:
                 self.screen = pygame.display.set_mode(self.size, self.flags | pygame.FULLSCREEN | pygame.NOFRAME)
             else:
@@ -144,11 +142,10 @@ class Window:
     def updateClock(self):
         output("Window: Getting FPS and delta time...", "complete")
         if self.useBusyLoop:
-            self.clock.tick_busy_loop(self.fpsLimit)
+            self.dt = self.clock.tick_busy_loop(self.fpsLimit)
         else:
-            self.clock.tick(self.fpsLimit)
+            self.dt = self.clock.tick(self.fpsLimit)
         self.fps = self.clock.get_fps()
-        self.dt = self.clock.get_time()
 
     def update(self):
         self.char = ""
@@ -175,6 +172,10 @@ class Window:
         x += self.__surfaceX
         y += self.__surfaceY
         return x, y
+    
+    def getScreenScale(self, scale, axis):
+        scale *= self.__surfaceSize[axis] / self.START_SURFACE_SIZE[axis]
+        return int(scale + 0.5)
     
     def onOptionalSurfaceRender(self):
         pass

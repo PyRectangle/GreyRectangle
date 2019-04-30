@@ -3,7 +3,7 @@ block attributes are
 0 Rotation (0, 1, 2, 3)
 1 Solid (0, 1)
 2 Death (0, 1)
-[0, 1, 2]
+order: [0, 1, 2]
 """
 
 import threading

@@ -1,6 +1,6 @@
+from pygameImporter import pygame
 from Frame.baseFunctions import *
 import threading
-import pygame
 
 
 class Gui:
@@ -125,7 +125,10 @@ class Gui:
         if not self.wasTouched and self.mouseTouchesButton:
             if self.sounds != None:
                 output("Gui: Playing gui hover sound...", "debug")
-                self.sounds[0].play()
+                try:
+                    self.sounds[0].play()
+                except pygame.error:
+                    pass
         self.wasTouched = self.mouseTouchesButton
         self.pressedKey = self.mouseTouchesButton and self.window.keys[self.window.guiPresser]
         self.getTouch()
@@ -134,7 +137,10 @@ class Gui:
         if not self.wasPressedGui and self.pressed:
             if self.sounds != None:
                 output("Gui: Playing gui click sound...", "debug")
-                self.sounds[1].play()
+                try:
+                    self.sounds[1].play()
+                except pygame.error:
+                    pass
         output("Gui: Is pressed: " + str(self.pressed), "complete")
         self.wasPressedGui = self.pressed
 

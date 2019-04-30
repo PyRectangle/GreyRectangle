@@ -1,7 +1,8 @@
+from pygameImporter import pygame
 from Frame.Render import Render
+from Script.Chat import Chat
 from Constants import *
 from Lifes import Lifes
-import pygame
 import math
 
 
@@ -30,6 +31,8 @@ class Player:
         self.renderObj = Render(self.main.window)
         self.onGround = False
         self.center = [0, 0]
+        self.canEscape = True
+        self.chat = Chat(main)
     
     def getBlockAt(self, x, y, load = False):
         if x < 0 or y < 0:
@@ -210,9 +213,20 @@ class Player:
                             break
                         if blockData[0] == 4: # finished level
                             self.main.menuHandler.goBack()
-            if self.main.window.keys[self.main.config.config["Controls"]["Escape"]] and go:
+            if not self.main.window.keys[self.main.config.config["Controls"]["Escape"]]:
+                self.canEscape = True
+            if self.main.window.keys[self.main.config.config["Controls"]["Escape"]] and go and self.canEscape:
                 self.quitMenu = True
                 self.main.menuHandler.show(self.main.menuHandler.playQuit)
+            if self.main.window.keys[self.main.config.config["Controls"]["OpenChat"]] and go:
+                self.chat.open()
+                self.quitMenu = True
+        elif self.chat.opened:
+            if self.main.window.keys[self.main.config.config["Controls"]["Escape"]]:
+                self.chat.close()
+                self.quitMenu = False
+                self.canEscape = False
+        self.chat.update()
     
     def getPixelCoords(self):
         self.main.camera.update(True)
@@ -250,3 +264,4 @@ class Player:
                 self.main.window.surface.blit(surface, self.coords[0])
         if self.main.playing or not self.go:
             self.lifesObj.render(self.renderObj, self.alpha)
+        self.chat.render()
