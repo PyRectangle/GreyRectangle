@@ -1,4 +1,5 @@
 {
+    "ClimbSpeed": 0.008,
     "Description": "Just some jumps",
     "FallSpeed": 1.0,
     "FallSpeedMultiplier": 1.003,

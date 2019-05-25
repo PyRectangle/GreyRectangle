@@ -1,4 +1,5 @@
 {
+    "ClimbSpeed": 0.01,
     "Description": "Now with deaths",
     "FallSpeed": 1.0,
     "FallSpeedMultiplier": 1.003,
