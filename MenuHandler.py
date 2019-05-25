@@ -1,3 +1,4 @@
+from Menus.Main.Settings.AnimationSettings import AnimationSettings
 from Menus.Main.LevelSelectionEdit.DeleteLevel import DeleteLevel
 from Menus.Main.LevelSelectionEdit.CreateLevel import CreateLevel
 from Menus.Main.LevelSelectionEdit import LevelSelectionEdit
@@ -13,6 +14,7 @@ from Menus.Main.ChatMenu import ChatMenu
 from Menus.Main.Settings import Settings
 from Menus.Main.PlayQuit import PlayQuit
 from Menus.Main.EditQuit import EditQuit
+from Menus.LoadScreen import LoadScreen
 from Frame.gui.Button import Button
 from pygameImporter import pygame
 from Frame.Render import Render
@@ -41,6 +43,8 @@ class MenuHandler:
         self.goToPlay = False
         self.goToEdit = False
         self.chatMenu = ChatMenu(self)
+        self.loadScreen = LoadScreen(self)
+        self.menus = [self.loadScreen]
 
     def create(self):
         self.mainMenu = MainMenu(self)
@@ -60,9 +64,11 @@ class MenuHandler:
         self.blockMenu = BlockMenu(self)
         self.regionMenu = RegionMenu(self)
         self.chatMenu = ChatMenu(self)
+        self.loadSaveLevel = LoadScreen(self, "Saving Level...")
+        self.animationSettings = AnimationSettings(self)
         self.menus = [self.mainMenu, self.levelSelection, self.settings, self.keyBindings, self.videoSettings, self.playQuit, self.editQuit, self.levelSelectionEdit,
                       self.createLevelMenu, self.deleteLevelMenu, self.actionMenu, self.levelOptions, self.ask, self.rename, self.blockMenu, self.regionMenu,
-                      self.chatMenu]
+                      self.chatMenu, self.loadScreen, self.loadSaveLevel, self.animationSettings]
     
     def showLevelOptions(self):
         self.levelOptions.do = True
@@ -195,7 +201,7 @@ class MenuHandler:
 
     def saveGoBack(self, save):
         if save:
-            self.main.editor.actions.save()
+            self.main.editor.saveLevel()
         self.main.editor.changed = False
         self.goBack()
 
@@ -207,8 +213,12 @@ class MenuHandler:
                 return
             self.goToEdit = True
         if self.main.playing:
+            self.main.player.chat.chatMessages.clearChat()
             self.main.player.alphaMove = True
             self.main.player.alphaUp = False
+            for block in self.main.blocks.blocks:
+                if block.overlays != None:
+                    block.overlay = {}
         if self.main.playing or self.main.editing:
             self.main.levelPreview.size = self.main.camera.size
             self.main.levelPreview.sizeDirect = False
@@ -248,9 +258,8 @@ class MenuHandler:
         self.editor = True
     
     def saveLevel(self):
-        Render(self.main.window).text(FONT, 100, "Saving...", True, (0, 0, 0), None, self.main.window.surface, 200, 900)
         if self.main.editor.actions != None:
-            self.main.editor.actions.save()
+            self.main.editor.saveLevel()
     
     def createLevel(self):
         if self.createLevelMenu.name == "":

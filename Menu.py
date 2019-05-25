@@ -22,7 +22,7 @@ class Menu:
             gui.update()
         count = 0
         for i in range(len(self.createdGuis)):
-            if self.createdGuis[i - count].remove and not self.createdGuis[i - count].inScreen:
+            if self.createdGuis[i - count].remove and (not self.createdGuis[i - count].inScreen or not self.createdGuis[i - count].comeIn):
                 del self.createdGuis[i - count]
                 count += 1
     

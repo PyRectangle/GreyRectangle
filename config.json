@@ -1,4 +1,5 @@
 {
+    "BlockAnimations": true,
     "Controls": {
         "DebugScreen": 282,
         "Escape": 27,
@@ -30,8 +31,12 @@
         "goUp": "Go up:"
     },
     "DebugScreenActive": false,
+    "ExitAnimation": true,
     "FPSLimit": 0,
     "Fullscreen": false,
+    "GuiComeInAnimations": true,
+    "GuiStaticAnimations": true,
+    "LevelTransitions": true,
     "SDL2": false,
     "UseBusyLoop": true,
     "Volume": 100

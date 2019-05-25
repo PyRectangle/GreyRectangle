@@ -1,3 +1,4 @@
+from pygameImporter import pygame
 from Constants import *
 
 
@@ -102,6 +103,14 @@ class Camera:
                 self.stopped = False
                 self.y = self.stop(self.stopDown, self.stop(self.stopUp, self.updateCoord(self.player.y, self.y, self.speedY), False), True)
                 self.stopY = self.stopped
+        for block in self.main.blocks.blocks:
+            if block.animation:
+                block.movie.update(self.main.window.dt)
+                block.tmpSurface = None
+            if block.overlays != None:
+                for overlay in block.overlayResources:
+                    if type(overlay) != pygame.Surface:
+                        overlay.update(self.main.window.dt)
     
     def render(self):
         if self.level != None:

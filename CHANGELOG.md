@@ -4,6 +4,7 @@
 - Added Buttons with animations
 - Added Sliders with animations
 - Added Line Edits with animations
+- Added Progress Bars
 ### Window
 - Added fullscreen
 - Added resizing with aspect ratio
@@ -46,6 +47,7 @@
 - Added freesansbold.ttf
 - Added block textures
 - Added gui sounds
+- Added animation system
 ## Player
 - Added a system that doesn't allow the player to go through walls
 - Added the ability to die
@@ -56,6 +58,9 @@
 - Added lifes
 - Can now see important changed block attributes
 - Added chat
+- Added animated block overlay
+- Added block event system
+- Added climbing
 ## Editor
 - Added a grid
 - Added go in / out animation for the grid
@@ -73,6 +78,7 @@
 - Added selecting and region selecting
 - Added filling, cloning and removingf of selection
 - Added movement using mouse
+- Added name of block in block selection
 ## Main
 - Added block loading
 - Added a configuration file
@@ -82,3 +88,4 @@
 - Added an exit animation
 - Added config saving when exiting
 - Added pygame_sdl2 support
+- Added Loading screen at startup

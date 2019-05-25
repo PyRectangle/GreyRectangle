@@ -1,8 +1,10 @@
 from pygameImporter import pygame
 from Frame.Render import Render
+from Script.Block import Block
 from Script.Chat import Chat
 from Constants import *
 from Lifes import Lifes
+from Script import run
 import math
 
 
@@ -32,6 +34,9 @@ class Player:
         self.onGround = False
         self.center = [0, 0]
         self.canEscape = True
+        self.spawn = None
+        self.climb = False
+        self.climbOver = 0
         self.chat = Chat(main)
     
     def getBlockAt(self, x, y, load = False):
@@ -104,15 +109,20 @@ class Player:
                   [self.x + PLAYER_BLOCK_SIZE[0], self.y],
                   [self.x - PLAYER_BLOCK_SIZE[0], self.y]]
         blocks = []
+        positions = []
         for point in points:
-            blocks.append(self.getBlockAt(int(point[0] + 0.5), int(point[1] + 0.5)))
-        return blocks
+            if not [int(point[0] + 0.5), int(point[1] + 0.5)] in positions:
+                blocks.append(self.getBlockAt(int(point[0] + 0.5), int(point[1] + 0.5)))
+                positions.append([int(point[0] + 0.5), int(point[1] + 0.5)])
+        return blocks, positions
 
     def fall(self):
-        self.fallSpeed *= self.main.camera.level.data.fallSpeedMultiplier
+        if not self.climbReal:
+            self.fallSpeed *= self.main.camera.level.data.fallSpeedMultiplier
         speed = self.fallSpeed
-        speed += self.lastFallSpeed
-        self.lastFallSpeed = speed - int(speed)
+        if not self.climbReal:
+            speed += self.lastFallSpeed
+            self.lastFallSpeed = speed - int(speed)
         for i in range(int(speed)):
             if not self.collide("y+"):
                 self.y += PLAYER_SPEED
@@ -168,6 +178,7 @@ class Player:
                 self.jumpTime = self.main.camera.level.data.jumpTime
                 self.jumpHeight = self.main.camera.level.data.jumpHeight
                 self.lifes = self.main.camera.level.data.lifes
+                self.climbSpeed = self.main.camera.level.data.climbSpeed
                 self.lifesObj.update(self.lifes)
                 self.first = False
             if self.active:
@@ -177,6 +188,7 @@ class Player:
                     speed = self.main.window.dt * PLAYER_LOOP_SPEED * self.main.camera.level.data.walkSpeed + self.lastSpeed
                     self.lastSpeed = speed - int(speed)
                     speed = int(speed)
+                    self.climbReal = False
                     for i in range(speed):
                         if self.main.window.keys[self.main.config.config["Controls"]["goRight"]]:
                             if not self.collide("x+"):
@@ -185,7 +197,15 @@ class Player:
                             if not self.collide("x-"):
                                 self.x -= PLAYER_SPEED
                         if self.main.window.keys[self.main.config.config["Controls"]["goUp"]] or self.main.window.keys[self.main.config.config["Controls"]["Jump"]]:
-                            if self.onGround:
+                            if self.climb:
+                                self.fallSpeed = self.main.camera.level.data.fallSpeed
+                                self.climbReal = True
+                                loop = self.climbSpeed / PLAYER_SPEED + self.climbOver
+                                self.climbOver = loop - int(loop)
+                                for i in range(int(loop)):
+                                    if not self.collide("y-"):
+                                        self.y -= PLAYER_SPEED
+                            elif self.onGround:
                                 self.jump()
                         if not self.jumping:
                             self.fall()
@@ -194,25 +214,79 @@ class Player:
                     self.jumpUpdate()
             if self.alphaMove:
                 if self.alphaUp:
+                    if self.main.window.disableGuiComeInAnimations:
+                        self.alpha = 255
                     self.alpha += self.main.window.dt / 10
                     if self.alpha > 255:
                         self.alpha = 255
                         self.alphaMove = False
                     self.getPixelCoords()
                 else:
+                    if self.main.window.disableGuiComeInAnimations:
+                        self.alpha = 0
                     self.alpha -= self.main.window.dt / 10
                     if self.alpha < 0:
                         self.alpha = 0
                         self.alphaMove = False
             if go and self.active:
-                for blockData in self.getTouch():
+                touchedBlocks, touchedPositions = self.getTouch()
+                count = 0
+                allBlocks = {}
+                for blockData in touchedBlocks:
                     if blockData != None:
+                        allBlocks[blockData[0]] = True
                         block = self.main.blocks.blocks[blockData[0]]
                         if block.death or (blockData[1] != [] and bool(int(blockData[1][2]))):
                             self.die()
                             break
                         if blockData[0] == 4: # finished level
                             self.main.menuHandler.goBack()
+                        touchEvent = None
+                        try:
+                            if block.events["PlayerTouch"] != None:
+                                touchEvent = "PlayerTouch"
+                        except (KeyError, TypeError):
+                            touchEvent = "PlayerTouchOnce"
+                        try:
+                            if block.events != None and block.events[touchEvent] != None:
+                                if block.lastTouched != None and block.lastTouched != touchedPositions[count]:
+                                    if block.lastBlockObject != None:
+                                        try:
+                                            if block.events["PlayerTouchOther"] != None:
+                                                try:
+                                                    run._executeBlock(block.events["PlayerTouchOther"], self.chat.scriptFunctions, block.lastBlockObject)
+                                                except Exception as error:
+                                                    self.chat.chatMessages.postMessage(str(error))
+                                        except KeyError:
+                                            pass
+                                if block.lastTouched != touchedPositions[count]:
+                                    block.lastBlockObject = Block(touchedPositions[count], self.main)
+                                    block.lastTouched = touchedPositions[count]
+                                    if touchEvent == "PlayerTouchOnce":
+                                        try:
+                                            run._executeBlock(block.events["PlayerTouchOnce"], self.chat.scriptFunctions, block.lastBlockObject)
+                                        except Exception as error:
+                                            self.chat.chatMessages.postMessage(str(error))
+                                if touchEvent == "PlayerTouch":
+                                    try:
+                                        run._executeBlock(block.events["PlayerTouch"], self.chat.scriptFunctions, block.lastBlockObject)
+                                    except Exception as error:
+                                        self.chat.chatMessages.postMessage(str(error))
+                        except KeyError:
+                            pass
+                    count += 1
+                    for block in self.main.blocks.blocks:
+                        try:
+                            try:
+                                allBlocks[block.ID]
+                            except KeyError:
+                                if block.events != None and block.events["PlayerNoTouch"] != None:
+                                    try:
+                                        run._executeBlock(block.events["PlayerNoTouch"], self.chat.scriptFunctions, None)
+                                    except Exception as error:
+                                        self.chat.chatMessages.postMessage(str(error))
+                        except KeyError:
+                            pass
             if not self.main.window.keys[self.main.config.config["Controls"]["Escape"]]:
                 self.canEscape = True
             if self.main.window.keys[self.main.config.config["Controls"]["Escape"]] and go and self.canEscape:
@@ -250,6 +324,9 @@ class Player:
         self.jumping = False
         self.lifes -= 1
         self.lifesObj.update(self.lifes)
+        if self.spawn != None:
+            self.x = self.spawn[0]
+            self.y = self.spawn[1]
         if self.lifes <= 0: # game over
             self.main.menuHandler.goBack()
     
