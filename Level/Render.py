@@ -9,7 +9,7 @@ class Render:
         self.main = main
         self.red = pygame.Surface((1, 1))
         self.red.fill((255, 0, 0))
-        self.lastSize = 144
+        self.lastSize = BLOCK_SIZE
     
     def blocks(self, x, y, size = BLOCK_SIZE, distance = None):
         size = int(size)
@@ -99,10 +99,27 @@ class Render:
         return rTexture
 
     def block(self, block, x, y, bigger = False, useNormalTexture = False, blockCoords = [-1, -1]):
+        hasOverlay = False
+        try:
+            overlayNumber = self.main.blocks.blocks[block[0]].overlay[str(blockCoords)]
+            overlay = self.main.blocks.blocks[block[0]].overlayResources[overlayNumber]
+            if self.main.blocks.blocks[block[0]].overlays[overlayNumber].endswith("mkv"):
+                overlaySurface = overlay.surface
+            else:
+                overlaySurface = overlay
+            hasOverlay = True
+        except KeyError:
+            overlay = None
         if useNormalTexture:
             texture = self.main.blocks.blocks[block[0]].texture
+            if texture != None:
+                texture = texture.copy()
+                if hasOverlay:
+                    texture.blit(overlaySurface, (0, 0))
         else:
             texture = self.main.blocks.blocks[block[0]].resizedTexture
+            if texture != None and hasOverlay:
+                texture.blit(pygame.transform.scale(overlaySurface, self.main.blocks.size), (0, 0))
         if self.main.playing and block[1] != []:
             distanceToBlock = [x + BLOCK_SIZE / 2 - self.main.player.center[0], y + BLOCK_SIZE / 2 - self.main.player.center[1]]
             for i in range(2):
@@ -130,7 +147,7 @@ class Render:
         if self.main.editing and self.main.editor.active:
             if texture == None:
                 if useNormalTexture:
-                    texture = pygame.Surface((144, 144))
+                    texture = pygame.Surface((BLOCK_SIZE, BLOCK_SIZE))
                 else:
                     texture = pygame.Surface(self.main.blocks.size)
                 texture.fill((255, 255, 255))
@@ -143,7 +160,7 @@ class Render:
             if not bigger:
                 self.window.surface.blit(texture, (x, y))
             else:
-                self.window.surface.blit(pygame.transform.scale(texture, (164, 164)), (x - 10, y - 10))
+                self.window.surface.blit(pygame.transform.scale(texture, (BLOCK_SIZE + 20, BLOCK_SIZE + 20)), (x - 10, y - 10))
     
     def grid(self, x, y, distance = BLOCK_SIZE, size = None):
         distance = int(distance)

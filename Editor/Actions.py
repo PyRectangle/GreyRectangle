@@ -22,12 +22,18 @@ class Actions:
         return region
         
     def deleteRegion(self, regionX, regionY, update = True):
-        try:
-            os.remove(LEVEL_REGION_EDITOR_TMP + "/" + str(regionX) + "-" + str(regionY) + ".rgn")
-        except FileNotFoundError:
-            pass
-        if update:
-            self.updateRegions()
+        if len(self.level.data.regions) > 1:
+            try:
+                index = self.level.data.regionsGrid[regionY - self.level.data.smallest[1]][regionX - self.level.data.smallest[0]].regionIndex
+                del self.level.data.regions[index]
+                for region in self.level.data.regions:
+                    if region.regionIndex > index:
+                        region.regionIndex -= 1
+                os.remove(LEVEL_REGION_EDITOR_TMP + "/" + str(regionX) + "-" + str(regionY) + ".rgn")
+            except (FileNotFoundError, AttributeError, IndexError):
+                pass
+            if update:
+                self.updateRegions()
 
     def getRegion(self, x, y, create = True, load = True):
         regionX, regionY = self.getRegionCoords(x, y)
@@ -56,9 +62,9 @@ class Actions:
             regionX += self.level.data.smallest[0]
             regionY += self.level.data.smallest[1]
         if regionX < 0:
-            regionX -= 1
+            regionX = int(regionX - 0.99)
         if regionY < 0:
-            regionY -= 1
+            regionY = int(regionY - 0.99)
         return int(regionX), int(regionY)
 
     def getRegionIndex(self, x, y):
@@ -90,7 +96,8 @@ class Actions:
             self.level.data.regionsGrid.append(line)
         for file in files:
             coords = self.level.data.getCoords(file)
-            region = Region(self.level, self.level.data.number, coords[0], coords[1], True, os.path.join(LEVEL_REGION_EDITOR_TMP, str(coords[0]) + "-" + str(coords[1]) + ".rgn"))
+            region = Region(self.level, self.level.data.number, coords[0], coords[1], True, os.path.join(LEVEL_REGION_EDITOR_TMP,
+                            str(coords[0]) + "-" + str(coords[1]) + ".rgn"), regionIndex = len(self.level.data.regions))
             self.level.data.regions.append(region)
             self.level.data.regionsGrid[coords[1] - self.level.data.smallest[1]][coords[0] - self.level.data.smallest[0]] = region
         self.level.data.loadJsonData()
@@ -129,15 +136,24 @@ class Actions:
                 self.setblock(x3 + x, y3 + y, *self.getblock(x1 + x, y1 + y), False)
 
     def save(self):
+        self.main.editor.setProgress(0)
+        regionNumber = len(self.level.data.regions)
+        count = 0
         for region in self.level.data.regions:
             region.save()
+            self.main.editor.setProgress(count / regionNumber * 99)
+            count += 1
         shutil.rmtree(os.path.join(self.level.folder, "region" + str(self.level.data.number)))
         shutil.copytree(LEVEL_REGION_EDITOR_TMP, os.path.join(self.level.folder, "region" + str(self.level.data.number)))
         self.level.data.save()
+        self.main.editor.setProgress(100)
         self.main.editor.changed = False
 
     def clean(self):
         if os.path.exists(LEVEL_REGION_EDITOR_TMP):
             shutil.rmtree(LEVEL_REGION_EDITOR_TMP)
-        self.level.data.__init__(self.level, self.level.data.number)
-        self.level.data.load()
+        try:
+            self.level.data.__init__(self.level, self.level.data.number)
+            self.level.data.load()
+        except FileNotFoundError:
+            pass

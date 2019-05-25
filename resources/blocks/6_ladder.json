@@ -1,0 +1,12 @@
+{
+    "Name": "Ladder",
+    "Texture": "ladder.png",
+    "Solid": false,
+    "Death": false,
+    "Colorkey": [[200, 200, 200], [255, 255, 255]],
+    "UnusedColor": [0, 0, 255],
+    "Events": {
+        "PlayerTouch": "gr.player.climb(True)",
+        "PlayerNoTouch": "gr.player.climb(False)"
+    }
+}

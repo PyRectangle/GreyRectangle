@@ -1,0 +1,15 @@
+{
+    "Name": "Checkpoint",
+    "Texture": "checkpoint.mkv",
+    "FPS": 60,
+    "Solid": false,
+    "Death": false,
+    "TextureFrame": 0,
+    "Overlays": ["RectangleAppear.mkv", "RectangleDisappear.mkv", "Rectangle.png"],
+    "OverlayFPS": [60, 60, null],
+    "OverlayColorkey": [[0, 0, 0], [100, 100, 100]],
+    "Events": {
+        "PlayerTouchOnce": "block.setOverlay(0, block.setOverlay, [2]); gr.player.setSpawn(*block.pos)",
+        "PlayerTouchOther": "block.setOverlay(1, block.setOverlay, [None])"
+    }
+}

@@ -10,8 +10,6 @@ class VideoSettings(Menu):
         super().__init__()
         self.keyTranslate = KeyTranslate()
         self.menuHandler = menuHandler
-        if self.menuHandler.main.config.config["Fullscreen"]:
-            self.menuHandler.window.toggleFullscreen()
         self.addGui(Button, (menuHandler.show, (menuHandler.settings), 60, 940, 300, 100, "Back", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True,
                              30, 30, 0.1, True, [1, 0], None, SOUNDS, menuHandler.window))
         self.addGui(Slider, (menuHandler.getFPSLimit, (200, 200, 200), 60, 80, 800, 120, "FPS Limit", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT,
@@ -22,6 +20,8 @@ class VideoSettings(Menu):
                              0.1, True, [1, 1], None, SOUNDS, menuHandler.window, 80))
         self.addGui(Button, (self.toggleSDL2, (), 60, 560, 800, 120, "Use SDL2: on", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30, 0.1,
                              True, [1, 1], None, SOUNDS, menuHandler.window, 80))
+        self.addGui(Button, (menuHandler.show, (19), 60, 720, 800, 120, "Animation Settings", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30,
+                             30, 0.1, True, [1, 1], None, SOUNDS, menuHandler.window, 80))
     
     def update(self):
         super().update()

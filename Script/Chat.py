@@ -1,6 +1,6 @@
 from Script.ScriptFunctions import ScriptFunctions
 from Script.ChatMessages import ChatMessages
-from Script.run import execute
+from Script import run
 
 
 class Chat:
@@ -15,7 +15,7 @@ class Chat:
     def process(self, text):
         if text[0] == "/":
             try:
-                execute(text[1:], self.scriptFunctions)
+                run._execute(text[1:], self.scriptFunctions)
             except Exception as error:
                 self.chatMessages.postMessage(str(error))
         else:

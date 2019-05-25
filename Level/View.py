@@ -1,4 +1,5 @@
 from Editor.Actions import Actions
+from pygameImporter import pygame
 from Constants import *
 
 
@@ -18,6 +19,7 @@ class View:
         self.canOpen = False
         self.willOpen = False
         self.useBlockWidth = False
+        self.animate = self.main.config.config["LevelTransitions"]
     
     def pressLevel(self, level):
         self.showLevel = level
@@ -25,9 +27,21 @@ class View:
         self.sizeDirect = False
         self.shouldRender = True
         self.canOpen = False
+        for block in self.main.blocks.blocks:
+            try:
+                for resource in block.overlayResources:
+                    if type(resource) != pygame.Surface:
+                        resource.finishedPlaying(*resource.args)
+            except AttributeError:
+                pass
+            if block.lastBlockObject != None:
+                block.lastBlockObject.setOverlay(None)
+            block.lastBlockObject = None
+            block.lastTouched = None
+            block.overlay = {}
         if level != None:
             self.main.levelSelection.setText(level.data.description)
-
+        
     def closeLevelSelection(self):
         if not self.main.levelSelection.toggleClosed:
             self.main.levelSelection.toggle()
@@ -60,14 +74,22 @@ class View:
                 self.willOpen = True
  
     def update(self):
+        self.animate = self.main.config.config["LevelTransitions"]
         if self.moveSize:
             if self.sizeDirect:
+                if not self.animate:
+                    self.size = VIEW_MAX_SIZE
                 self.size += self.window.dt * VIEW_SPEED
                 if self.size > VIEW_MAX_SIZE:
                     self.moveSize = False
                     self.canOpen = True
                     self.size = VIEW_MAX_SIZE
             else:
+                if not self.animate:
+                    if self.toNormal:
+                        self.size = BLOCK_SIZE
+                    else:
+                        self.size = VIEW_MIN_SIZE
                 self.size -= self.window.dt * VIEW_SPEED
                 if self.size < VIEW_MIN_SIZE:
                     self.size = VIEW_MIN_SIZE
@@ -85,6 +107,15 @@ class View:
             self.main.camera.setCoords(self.showLevel)
             self.level = self.showLevel
             self.sizeDirect = True
+        for block in self.main.blocks.blocks:
+            if block.animation:
+                block.movie.update(self.main.window.dt)
+                block.tmpSurface = None
+            if block.overlays != None:
+                for overlay in block.overlayResources:
+                    if type(overlay) != pygame.Surface:
+                        overlay.update(self.main.window.dt)
+
     
     def render(self):
         if self.level != None:

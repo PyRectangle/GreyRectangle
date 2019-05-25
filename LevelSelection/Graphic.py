@@ -19,8 +19,10 @@ class Graphic:
         self.y = 0
         self.textAlpha = 255
         self.renderVertices = []
+        self.animate = not self.window.disableGuiComeInAnimations
 
     def toggle(self):
+        self.animate = not self.window.disableGuiComeInAnimations
         if self.isChanging:
             if self.isOpen:
                 self.finishedClose()
@@ -32,47 +34,55 @@ class Graphic:
         self.isChanging = False
         self.isOpen = True
         self.isClosed = False
+        self.point = [0, 0]
 
     def finishedClose(self):
         self.isChanging = False
         self.isOpen = False
         self.isClosed = True
+        self.point = self.firstPoint.copy()
         
     def update(self):
         if self.isChanging:
             if self.isClosed:
-                count = 0
-                for i in range(2):
-                    if self.point[i] < 0:
-                        self.point[i] += self.window.dt * self.speed
-                        if self.point[i] >= 0:
-                            self.point[i] = 0
+                if self.animate:
+                    count = 0
+                    for i in range(2):
+                        if self.point[i] < 0:
+                            self.point[i] += self.window.dt * self.speed
+                            if self.point[i] >= 0:
+                                self.point[i] = 0
+                                count += 1
+                        elif self.point[i] > 0:
+                            self.point[i] -= self.window.dt * self.speed
+                            if self.point[i] <= 0:
+                                self.point[i] = 0
+                                count += 1
+                        else:
                             count += 1
-                    elif self.point[i] > 0:
-                        self.point[i] -= self.window.dt * self.speed
-                        if self.point[i] <= 0:
-                            self.point[i] = 0
-                            count += 1
-                    else:
-                        count += 1
-                if count == 2:
+                    if count == 2:
+                        self.finishedOpen()
+                else:
                     self.finishedOpen()
             elif self.isOpen:
-                count = 0
-                for i in range(2):
-                    if self.point[i] < self.firstPoint[i]:
-                        self.point[i] += self.window.dt * self.speed
-                        if self.point[i] >= self.firstPoint[i]:
-                            self.point[i] = self.firstPoint[i]
+                if self.animate:
+                    count = 0
+                    for i in range(2):
+                        if self.point[i] < self.firstPoint[i]:
+                            self.point[i] += self.window.dt * self.speed
+                            if self.point[i] >= self.firstPoint[i]:
+                                self.point[i] = self.firstPoint[i]
+                                count += 1
+                        elif self.point[i] > self.firstPoint[i]:
+                            self.point[i] -= self.window.dt * self.speed
+                            if self.point[i] <= self.firstPoint[i]:
+                                self.point[i] = self.firstPoint[i]
+                                count += 1
+                        else:
                             count += 1
-                    elif self.point[i] > self.firstPoint[i]:
-                        self.point[i] -= self.window.dt * self.speed
-                        if self.point[i] <= self.firstPoint[i]:
-                            self.point[i] = self.firstPoint[i]
-                            count += 1
-                    else:
-                        count += 1
-                if count == 2:
+                    if count == 2:
+                        self.finishedClose()
+                else:
                     self.finishedClose()
         self.renderVertices = []
         for vertex in self.vertices:

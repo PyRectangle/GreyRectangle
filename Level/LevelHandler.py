@@ -21,6 +21,7 @@ class LevelHandler:
         pathToLevelRegion = os.path.join(LEVEL_PATH, name, "region0")
         os.makedirs(pathToLevelRegion)
         jsonData = {
+            "ClimbSpeed": 0.008,
             "SpawnX": 0,
             "SpawnY": 1,
             "Lifes": 10,

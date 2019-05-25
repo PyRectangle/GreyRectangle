@@ -10,6 +10,9 @@ class Gui:
                ", ...) named " + text, "debug")
         if textSize == None:
             textSize = height
+        if window.disableGuiComeInAnimations:
+            comeIn = False
+        self.noAnimations = window.disableGuiAnimations
         self.textSize = textSize
         self.x = x
         self.y = y
@@ -22,13 +25,16 @@ class Gui:
         self.textColor = textColor
         self.fontFile = fontFile
         self.antialias = antialias
-        self.sounds = []
-        for sound in sounds:
-            if sound != None:
-                try:
-                    self.sounds.append(pygame.mixer.Sound(sound))
-                except (pygame.error, AttributeError):
-                    self.sounds = None
+        if sounds != None:
+            self.sounds = []
+            for sound in sounds:
+                if sound != None:
+                    try:
+                        self.sounds.append(pygame.mixer.Sound(sound))
+                    except (pygame.error, AttributeError):
+                        self.sounds = None
+        else:
+            self.sounds = None
         self.volume = 1
         self.pressed = False
         self.wasPressedGui = False
@@ -55,12 +61,13 @@ class Gui:
         self.keyOnGui = False
         self.touchable = True
         self.startPos = startPos
+        self.inScreen = True
+        self.oncePressMouse = False
         output("Gui: Getting the start position...", "debug")
         if self.comeIn:
             self.rightCoords = False
             self.goTo = [self.x, self.y]
             self.direction = direction
-            self.inScreen = True
             if self.startPos == None:
                 while self.inScreen:
                     self.x -= self.direction[0]
@@ -132,9 +139,14 @@ class Gui:
         self.wasTouched = self.mouseTouchesButton
         self.pressedKey = self.mouseTouchesButton and self.window.keys[self.window.guiPresser]
         self.getTouch()
-        self.pressedMouse = self.mouseTouchesButton and self.window.mousePressed != (0, 0, 0)
+        if self.oncePressMouse:
+            self.pressedMouse = self.mouseTouchesButton and self.window.pressedMouse
+            if self.pressedMouse:
+                self.window.pressedMouse = False
+        else:
+            self.pressedMouse = self.mouseTouchesButton and self.window.mousePressed != (0, 0, 0)
         self.pressed = self.pressedKey or self.pressedMouse
-        if not self.wasPressedGui and self.pressed:
+        if self.pressed:
             if self.sounds != None:
                 output("Gui: Playing gui click sound...", "debug")
                 try:
@@ -153,7 +165,7 @@ class Gui:
         self.rightCoords = False
         self.remove = True
 
-    def render(self):
+    def render(self, text = True):
         output("Gui: Rendering...", "complete")
         points = [self.coords[0:2], [self.coords[0] + self.coords[2], self.coords[1]], [self.coords[0] + self.coords[2], self.coords[1] + self.coords[3]],
                   [self.coords[0], self.coords[1] + self.coords[3]]]
@@ -166,15 +178,16 @@ class Gui:
                 pygame.draw.polygon(self.window.surface, self.lineEditColor, points)
         except AttributeError:
             pass
-        try:
-            if not self.writable and self.text == "":
-                self.renderObj.text(self.fontFile, int(self.textSize + self.height - self.startCoords[3]), self.enterText, self.antialias, self.textColor, None,
+        if text:
+            try:
+                if not self.writable and self.text == "":
+                    self.renderObj.text(self.fontFile, int(self.textSize + self.height - self.startCoords[3]), self.enterText, self.antialias, self.textColor, None,
+                                        self.window.surface, width = self.width, height = self.height, addX = self.x, addY = self.y)
+                else:
+                    self.renderLineEdit()
+            except AttributeError:
+                self.renderObj.text(self.fontFile, int(self.textSize + self.height - self.startCoords[3]), self.text, self.antialias, self.textColor, None,
                                     self.window.surface, width = self.width, height = self.height, addX = self.x, addY = self.y)
-            else:
-                self.renderLineEdit()
-        except AttributeError:
-            self.renderObj.text(self.fontFile, int(self.textSize + self.height - self.startCoords[3]), self.text, self.antialias, self.textColor, None,
-                                self.window.surface, width = self.width, height = self.height, addX = self.x, addY = self.y)
         pygame.draw.lines(self.window.surface, self.frameColor, 4, [[self.x, self.y], [self.x + self.width, self.y],
                                                                     [self.x + self.width, self.y + self.height], [self.x, self.y + self.height],
                                                                     [self.x, self.y]], 1)
@@ -191,16 +204,17 @@ class Gui:
 
     def resize(self, difference):
         output("Gui: Resizing...", "complete")
-        if self.last != difference:
-            self.step = 0
-        self.last = difference
-        self.step += 1
-        if self.step <= self.steps:
-            self.x += self.xStep * difference
-            self.y += self.yStep * difference
-            self.height -= self.yStep * difference * 2
-            self.width -= self.xStep * difference * 2
-            self.coords = [self.x, self.y, self.width, self.height]
+        if not self.noAnimations:
+            if self.last != difference:
+                self.step = 0
+            self.last = difference
+            self.step += 1
+            if self.step <= self.steps:
+                self.x += self.xStep * difference
+                self.y += self.yStep * difference
+                self.height -= self.yStep * difference * 2
+                self.width -= self.xStep * difference * 2
+                self.coords = [self.x, self.y, self.width, self.height]
 
     def setSize(self, pos):
         output("Gui: Setting size to something smaller/bigger: " + str(pos) + "...", "complete")

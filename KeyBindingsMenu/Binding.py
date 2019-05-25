@@ -29,6 +29,8 @@ class Binding:
         for graphic in self.graphics:
             if graphic.isOpen:
                 graphic.toggle()
+            if self.window.disableGuiComeInAnimations:
+                graphic.finishedClose()
         self.button.delete()
     
     def getKeyName(self, key):

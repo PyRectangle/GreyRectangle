@@ -18,6 +18,9 @@ class Render:
     def text(self, file, size, text, antialias, color, background, surface, x = None, y = None, blit = True, width = None, height = None, addX = 0, addY = 0,
              alpha = 255):
         output("Render: Rendering \"" + text + "\"...", "complete")
+        if self.window.disableGuiComeInAnimations:
+            if alpha > 0:
+                alpha = 255
         textSurface = pygame.font.Font(file, size).render(text, antialias, color, background)
         if x == None or y == None:
             if surface == None:

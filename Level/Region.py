@@ -3,7 +3,8 @@ block attributes are
 0 Rotation (0, 1, 2, 3)
 1 Solid (0, 1)
 2 Death (0, 1)
-order: [0, 1, 2]
+3 seen by camera (0, 1)
+order: [0, 1, 2, 3]
 """
 
 import threading
@@ -12,9 +13,10 @@ import os
 
 
 class Region():
-    def __init__(self, level, number, x, y, withoutLevel = False, file = ""):
+    def __init__(self, level, number, x, y, withoutLevel = False, file = "", regionIndex = None):
         self.x = x
         self.y = y
+        self.regionIndex = regionIndex
         if withoutLevel:
             self.file = file
         else:
@@ -78,7 +80,7 @@ class Region():
             for line in self.region:
                 for block in line:
                     file.write(chr(block[0]).encode())
-                    if block[1] != None:
+                    if block[1] != []:
                         file.write(chr(1000000).encode())
                         for i in block[1]:
                             file.write(chr(i).encode())

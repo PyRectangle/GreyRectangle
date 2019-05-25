@@ -9,6 +9,7 @@ class Data:
         self.regionsGrid = []
         self.level = level
         self.number = number
+        self.deleteCount = 0
         files = os.listdir(level.folder + "/region" + str(number))
         files.sort()
         self.smallest = self.getCoords(files[-1])
@@ -27,7 +28,7 @@ class Data:
             self.regionsGrid.append(line)
         for file in files:
             coords = self.getCoords(file)
-            region = Region(level, number, *coords)
+            region = Region(level, number, *coords, regionIndex = len(self.regions))
             self.regions.append(region)
             self.regionsGrid[coords[1] - self.smallest[1]][coords[0] - self.smallest[0]] = region
 
@@ -62,6 +63,7 @@ class Data:
         self.walkSpeed = self.jsonData["WalkSpeed"]
         self.fallSpeed = self.jsonData["FallSpeed"]
         self.fallSpeedMultiplier = self.jsonData["FallSpeedMultiplier"]
+        self.climbSpeed = self.jsonData["ClimbSpeed"]
         self.description = self.jsonData["Description"]
 
     def save(self):

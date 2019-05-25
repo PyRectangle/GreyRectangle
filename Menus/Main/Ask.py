@@ -14,10 +14,10 @@ class Ask(Menu):
         self.renderObj = Render(menuHandler.window)
         self.addGui(Button, (menuHandler.continuePlay, (), 40, 940, 300, 100, "Back", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30,
                              0.1, True, [0, -1], None, SOUNDS, menuHandler.window))
-        self.addGui(Button, (menuHandler.saveGoBack, (True), 470, 490, 200, 100, "Yes", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30,
-                             0.1, True, [1, 0], None, SOUNDS, menuHandler.window))
-        self.addGui(Button, (menuHandler.saveGoBack, (False), 770, 490, 200, 100, "No", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30,
-                             0.1, True, [-1, 0], None, SOUNDS, menuHandler.window))
+        self.addGui(Button, (menuHandler.saveGoBack, (True), 370, 490, 300, 100, "Yes", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30,
+                             0.1, True, [2, 0], None, SOUNDS, menuHandler.window))
+        self.addGui(Button, (menuHandler.saveGoBack, (False), 770, 490, 300, 100, "No", (100, 100, 100), (0, 0, 0), (100, 100, 255), (0, 0, 0), FONT, True, 30, 30,
+                             0.1, True, [-2, 0], None, SOUNDS, menuHandler.window))
 
     def create(self):
         super().create()

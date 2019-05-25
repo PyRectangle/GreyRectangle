@@ -32,7 +32,7 @@ class GuiHandler:
         count = 0
         for i in range(len(self.allGuis)):
             try:
-                if self.allGuis[i].remove and not self.allGuis[i].inScreen:
+                if self.allGuis[i].remove and (not self.allGuis[i].inScreen or not self.allGuis[i].comeIn):
                     del self.allGuis[i - count]
                     count += 1
             except IndexError:

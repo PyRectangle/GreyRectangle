@@ -9,12 +9,19 @@ class Button(Gui):
         self.wasPressed = False
         self.function = function
         self.functionArgs = functionArgs
+        self.oncePressMouse = True
 
     def update(self):
         super().update()
         output("Button: Creating a click animastion if pressed...", "complete")
         if self.pressed and not self.wasPressed and self.rightCoords:
-            self.window.guiHandler.createClickAnim(self)
+            if self.noAnimations:
+                if type(self.functionArgs) == tuple:
+                    self.function(*self.functionArgs)
+                else:
+                    self.function(self.functionArgs)
+            else:
+                self.window.guiHandler.createClickAnim(self)
         self.wasPressed = self.pressed
     
     def render(self):

@@ -147,7 +147,6 @@ class Editor:
     
     def selectRegion(self):
         self.selectionTry = [[int(self.mouseBlockPos[0] / 16), int(self.mouseBlockPos[1] / 16)], []]
-        self.regionSelection = None
         self.selectRegions = True
     
     def deselect(self):
@@ -175,12 +174,33 @@ class Editor:
                 back = selection[0][i]
                 selection[0][i] = selection[1][i]
                 selection[1][i] = back
-        self.actions.deleteRegion(selection[0][0] + self.actions.level.data.smallest[0], selection[0][1] + self.actions.level.data.smallest[1])
         for y in range(selection[1][1] - selection[0][1] + 1):
             for x in range(selection[1][0] - selection[0][0] + 1):
-                self.actions.deleteRegion(selection[0][0] + x + self.actions.level.data.smallest[0], selection[0][1] + y + self.actions.level.data.smallest[1])
+                self.actions.deleteRegion(selection[0][0] + x + self.actions.level.data.smallest[0], selection[0][1] + y + self.actions.level.data.smallest[1],
+                                          update = False)
         self.deselect()
+        self.actions.updateRegions()
         self.changed = True
+    
+    def saveLevel(self):
+        openActions = self.main.menuHandler.actionMenu.created
+        self.main.menuHandler.show(self.main.menuHandler.loadSaveLevel)
+        self.actions.save()
+        self.main.window.updateClock()
+        if openActions:
+            self.main.menuHandler.show(self.main.menuHandler.actionMenu)
+    
+    def setProgress(self, progress):
+        self.main.menuHandler.loadSaveLevel.createdGuis[0].setProgress(progress)
+        self.main.menuHandler.update()
+        self.main.window.surface.fill((255, 255, 255))
+        self.render()
+        self.main.camera.render()
+        self.main.editor.render()
+        self.main.menuHandler.render()
+        if self.main.debugScreenActive:
+            self.main.debugScreen.render()
+        self.main.window.updateDisplay()
 
     def render(self):
         active = self.active
